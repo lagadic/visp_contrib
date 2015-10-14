@@ -2,7 +2,7 @@
 
 This repository is intended for development of "extra" modules that are contribution from the community, or that do not have stable API, that are not well-tested or that cannot be added to ViSP due to licensing. Thus, they shouldn't be released as a part of official ViSP distribution.
 
-So, all the new modules should be developed separately, and published in the visp_contrib repository at first. Later, when the module matures, gains popularity and is compatible with ViSP licensing, it is moved to the central [ViSP](https://github.com/lagadic/visp) repository, and the development team provides production quality support for this module.
+So, all the new modules should be developed separately, and published in the [visp_contrib](https://github.com/lagadic/visp_contrib) repository at first. Later, when the module matures, gains popularity and is compatible with ViSP licensing, it is moved to the central [ViSP](https://github.com/lagadic/visp) repository, and the development team provides production quality support for this module.
 
 ## How to build ViSP with extra modules
 
