@@ -1,7 +1,5 @@
 /****************************************************************************
  *
- * $Id$
- *
  * This file is part of the ViSP software.
  * Copyright (C) 2005 - 2014 by INRIA. All rights reserved.
  * 
@@ -55,11 +53,25 @@
 
 namespace vp
 {
+  VISP_EXPORT void adjust(vpImage<unsigned char> &I, const double alpha, const double beta);
   VISP_EXPORT void adjust(const vpImage<unsigned char> &I1, vpImage<unsigned char> &I2, const double alpha, const double beta);
+  VISP_EXPORT void adjust(vpImage<vpRGBa> &I, const double alpha, const double beta);
   VISP_EXPORT void adjust(const vpImage<vpRGBa> &I1, vpImage<vpRGBa> &I2, const double alpha, const double beta);
 
+  VISP_EXPORT void equalizeHistogram(vpImage<unsigned char> &I);
   VISP_EXPORT void equalizeHistogram(const vpImage<unsigned char> &I1, vpImage<unsigned char> &I2);
+  VISP_EXPORT void equalizeHistogram(vpImage<vpRGBa> &I, const bool useHSV=false);
   VISP_EXPORT void equalizeHistogram(const vpImage<vpRGBa> &I1, vpImage<vpRGBa> &I2, const bool useHSV=false);
+
+  VISP_EXPORT void gammaCorrection(vpImage<unsigned char> &I, const double gamma);
+  VISP_EXPORT void gammaCorrection(const vpImage<unsigned char> &I1, vpImage<unsigned char> &I2, const double gamma);
+  VISP_EXPORT void gammaCorrection(vpImage<vpRGBa> &I, const double gamma);
+  VISP_EXPORT void gammaCorrection(const vpImage<vpRGBa> &I1, vpImage<vpRGBa> &I2, const double gamma);
+
+  VISP_EXPORT void stretchContrast(vpImage<unsigned char> &I);
+  VISP_EXPORT void stretchContrast(const vpImage<unsigned char> &I1, vpImage<unsigned char> &I2);
+  VISP_EXPORT void stretchContrast(vpImage<vpRGBa> &I);
+  VISP_EXPORT void stretchContrast(const vpImage<vpRGBa> &I1, vpImage<vpRGBa> &I2);
 }
 
 #endif
