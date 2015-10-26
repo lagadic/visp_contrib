@@ -39,13 +39,14 @@
 
 /*!
   \file vpImgproc.cpp
-  \brief Static functions for basic image processing functions.
+  \brief Basic image processing functions.
 */
 
 #include <visp3/imgproc/vpImgproc.h>
 #include <visp3/core/vpMath.h>
 #include <visp3/core/vpHistogram.h>
 #include <visp3/core/vpImageConvert.h>
+#include <visp3/core/vpImageFilter.h>
 
 
 /*!
@@ -226,35 +227,22 @@ void vp::equalizeHistogram(vpImage<vpRGBa> &I, const bool useHSV) {
       cpt++;
     }
   } else {
-    //TODO: add conversion RGBa and HSV
+    vpImage<unsigned char> hue(I.getHeight(), I.getWidth());
+    vpImage<unsigned char> saturation(I.getHeight(), I.getWidth());
+    vpImage<unsigned char> value(I.getHeight(), I.getWidth());
+
+    unsigned int size = I.getWidth()*I.getHeight();
+    //Convert from RGBa to HSV
+    vpImageConvert::RGBaToHSV((unsigned char *) I.bitmap, (unsigned char *) hue.bitmap,
+        (unsigned char *) saturation.bitmap, (unsigned char *) value.bitmap, size);
+
+    //Histogram equalization on the value plane
+    vp::equalizeHistogram(value);
+
+    //Convert from HSV to RGBa
+    vpImageConvert::HSVToRGBa((unsigned char*) hue.bitmap, (unsigned char*) saturation.bitmap,
+        (unsigned char*) value.bitmap, (unsigned char*) I.bitmap, size);
   }
-//    vpImage<double> hue(I1.getHeight(), I1.getWidth());
-//    vpImage<double> saturation(I1.getHeight(), I1.getWidth());
-//    vpImage<double> value(I1.getHeight(), I1.getWidth());
-//
-//    unsigned int size = I1.getWidth()*I1.getHeight();
-//    //Convert from RGBa to HSV
-//    vpImageConvert::RGBaToHSV((unsigned char*) I1.bitmap, (double*) hue.bitmap, (double*) saturation.bitmap,
-//        (double*) value.bitmap, size);
-//
-//    //Convert from double image to unsigned char image
-//    vpImage<unsigned char> valueImg(I1.getHeight(), I1.getWidth());
-//    for(unsigned int cpt = 0; cpt < size; cpt++) {
-//      valueImg.bitmap[cpt] = (unsigned char) (value.bitmap[cpt] * 255.0);
-//    }
-//
-//    //Histogram equalization on the value plane
-//    vpImageTools::equalizeHistogram(valueImg, valueImg);
-//
-//    //Convert from unsigned char image to double image
-//    for(unsigned int cpt = 0; cpt < size; cpt++) {
-//      value.bitmap[cpt] = valueImg.bitmap[cpt] / 255.0;
-//    }
-//
-//    //Convert from HSV to RGBa
-//    vpImageConvert::HSVToRGBa((double*) hue.bitmap, (double*) saturation.bitmap,
-//        (double*) value.bitmap, (unsigned char*) I2.bitmap, size);
-//  }
 }
 
 /*!
@@ -385,7 +373,7 @@ void vp::stretchContrast(const vpImage<unsigned char> &I1, vpImage<unsigned char
 /*!
   Stretch the contrast of a color image.
 
-  \param I1 : The color image to stretch the contrast.
+  \param I : The color image to stretch the contrast.
 */
 void vp::stretchContrast(vpImage<vpRGBa> &I) {
   //Find min and max intensity values
@@ -468,6 +456,146 @@ void vp::stretchContrast(const vpImage<vpRGBa> &I1, vpImage<vpRGBa> &I2) {
   //Copy I1 to I2
   I2 = I1;
   vp::stretchContrast(I2);
+}
+
+/*!
+  Stretch the contrast of a color image in the HSV color space.
+  The saturation and value components are stretch so the hue is preserved.
+
+  \param I : The color image to stetch the contrast in the HSV color space.
+*/
+void vp::stretchContrastHSV(vpImage<vpRGBa> &I) {
+  unsigned int size = I.getWidth()*I.getHeight();
+
+  //Convert RGB to HSV
+  vpImage<double> hueImage(I.getHeight(), I.getWidth()), saturationImage(I.getHeight(), I.getWidth()),
+      valueImage(I.getHeight(), I.getWidth());
+  vpImageConvert::RGBaToHSV((unsigned char *) I.bitmap, hueImage.bitmap, saturationImage.bitmap,
+      valueImage.bitmap, size);
+
+  //Find min and max Saturation and Value
+  double minSaturation, maxSaturation, minValue, maxValue;
+  saturationImage.getMinMaxValue(minSaturation, maxSaturation);
+  valueImage.getMinMaxValue(minValue, maxValue);
+
+  //Stretch Saturation
+  double *ptrStart = saturationImage.bitmap;
+  double *ptrEnd = saturationImage.bitmap + size;
+  double *ptrCurrent = ptrStart;
+
+  if(maxSaturation - minSaturation > 0.0) {
+    while(ptrCurrent != ptrEnd) {
+      *ptrCurrent = (*ptrCurrent - minSaturation) / (maxSaturation - minSaturation);
+      ++ptrCurrent;
+    }
+  }
+
+  if(maxValue - minValue > 0.0) {
+    ptrStart = valueImage.bitmap;
+    ptrEnd = valueImage.bitmap + size;
+    ptrCurrent = ptrStart;
+
+    while(ptrCurrent != ptrEnd) {
+      *ptrCurrent = (*ptrCurrent - minValue) / (maxValue - minValue);
+      ++ptrCurrent;
+    }
+  }
+
+  //Convert HSV to RGBa
+  vpImageConvert::HSVToRGBa(hueImage.bitmap, saturationImage.bitmap, valueImage.bitmap, (unsigned char *) I.bitmap, size);
+}
+
+/*!
+  Stretch the contrast of a color image in the HSV color space.
+  The saturation and value components are stretch so the hue is preserved.
+
+  \param I1 : The first input color image.
+  \param I2 : The second output color image.
+*/
+void vp::stretchContrastHSV(const vpImage<vpRGBa> &I1, vpImage<vpRGBa> &I2) {
+  //Copy I1 to I2
+  I2 = I1;
+  vp::stretchContrastHSV(I2);
+}
+
+/*!
+  Sharpen a grayscale image using the unsharp mask technique.
+
+  \param I : The grayscale image to sharpen.
+  \param size : Size (must be odd) of the Gaussian blur kernel.
+  \param weight : Weight (between [0 - 1[) for the sharpening process.
+ */
+void vp::unsharpMask(vpImage<unsigned char> &I, const unsigned int size, const double weight) {
+  if(weight < 1.0 && weight >= 0.0) {
+    //Gaussian blurred image
+    vpImage<double> I_blurred;
+    vpImageFilter::gaussianBlur(I, I_blurred, size);
+
+    //Unsharp mask
+    for(unsigned int cpt = 0; cpt < I.getSize(); cpt++) {
+      double val = (I.bitmap[cpt] - weight*I_blurred.bitmap[cpt]) / (1 - weight);
+      I.bitmap[cpt] = vpMath::saturate<unsigned char>(val); //val > 255 ? 255 : (val < 0 ? 0 : val);
+    }
+  }
+}
+
+/*!
+  Sharpen a grayscale image using the unsharp mask technique.
+
+  \param I1 : The first input grayscale image.
+  \param I2 : The second output grayscale image.
+  \param size : Size (must be odd) of the Gaussian blur kernel.
+  \param weight : Weight (between [0 - 1[) for the sharpening process.
+*/
+void vp::unsharpMask(const vpImage<unsigned char> &I1, vpImage<unsigned char> &I2, const unsigned int size, const double weight) {
+  //Copy I1 to I2
+  I2 = I1;
+  vp::unsharpMask(I2, size, weight);
+}
+
+/*!
+  Sharpen a color image using the unsharp mask technique.
+
+  \param I : The color image to sharpen.
+  \param size : Size (must be odd) of the Gaussian blur kernel.
+  \param weight : Weight (between [0 - 1[) for the sharpening process.
+ */
+void vp::unsharpMask(vpImage<vpRGBa> &I, const unsigned int size, const double weight) {
+  if(weight < 1.0 && weight >= 0.0) {
+    //Gaussian blurred image
+    vpImage<double> I_blurred_R,  I_blurred_G,  I_blurred_B;
+    vpImage<unsigned char> I_R, I_G, I_B;
+
+    vpImageConvert::split(I, &I_R, &I_G, &I_B);
+    vpImageFilter::gaussianBlur(I_R, I_blurred_R, size);
+    vpImageFilter::gaussianBlur(I_G, I_blurred_G, size);
+    vpImageFilter::gaussianBlur(I_B, I_blurred_B, size);
+
+    //Unsharp mask
+    for(unsigned int cpt = 0; cpt < I.getSize(); cpt++) {
+      double val_R = (I.bitmap[cpt].R - weight*I_blurred_R.bitmap[cpt]) / (1 - weight);
+      double val_G = (I.bitmap[cpt].G - weight*I_blurred_G.bitmap[cpt]) / (1 - weight);
+      double val_B = (I.bitmap[cpt].B - weight*I_blurred_B.bitmap[cpt]) / (1 - weight);
+
+      I.bitmap[cpt].R = vpMath::saturate<unsigned char>(val_R);
+      I.bitmap[cpt].G = vpMath::saturate<unsigned char>(val_G);
+      I.bitmap[cpt].B = vpMath::saturate<unsigned char>(val_B);
+    }
+  }
+}
+
+/*!
+  Sharpen a color image using the unsharp mask technique.
+
+  \param I1 : The first input color image.
+  \param I2 : The second output color image.
+  \param size : Size (must be odd) of the Gaussian blur kernel.
+  \param weight : Weight (between [0 - 1[) for the sharpening process.
+*/
+void vp::unsharpMask(const vpImage<vpRGBa> &I1, vpImage<vpRGBa> &I2, const unsigned int size, const double weight) {
+  //Copy I1 to I2
+  I2 = I1;
+  vp::unsharpMask(I2, size, weight);
 }
 
 
