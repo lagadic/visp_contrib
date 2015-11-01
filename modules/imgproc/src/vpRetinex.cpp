@@ -183,6 +183,8 @@ void MSRCR(vpImage<vpRGBa> &I, const int _scale, const int scaleDiv,
 }
 
 /*!
+  \ingroup group_imgproc_retinex
+
   Enhance the contrast of a color image using the Retinex technique, based on the Retinex ImageJ plugin:
   Retinex filtering is based on Land's theory of image perception, proposed to explain the perceived colour constancy
   of objects under varying illumination conditions. Several approaches exist to implement the retinex principles,
@@ -196,12 +198,9 @@ void MSRCR(vpImage<vpRGBa> &I, const int _scale, const int scaleDiv,
   \param scaleDiv : Specifies the number of iterations of the multiscale filter.
   Values larger than 2 exploit the "multiscale" nature of the algorithm.
   \param level : Specifies distribution of the Gaussian blurring kernel sizes for Scale division values > 2:
-    0
-        tends to treat all image intensities similarly,
-    1
-        enhances dark regions of the image,
-    2
-        enhances the bright regions of the image.
+    - 0, tends to treat all image intensities similarly,
+    - 1, enhances dark regions of the image,
+    - 2, enhances the bright regions of the image.
   \param dynamic : Adjusts the color of the result. Large values produce less saturated images.
   \param kernelSize : Kernel size for the gaussian blur operation. If -1, the kernel size is calculated from the image size.
 */
@@ -226,6 +225,8 @@ void vp::retinex(vpImage<vpRGBa> &I, const int scale, const int scaleDiv,
 }
 
 /*!
+  \ingroup group_imgproc_retinex
+
   Enhance the contrast of a color image using the Retinex technique, based on the Retinex ImageJ plugin:
   Retinex filtering is based on Land's theory of image perception, proposed to explain the perceived colour constancy
   of objects under varying illumination conditions. Several approaches exist to implement the retinex principles,
@@ -240,12 +241,9 @@ void vp::retinex(vpImage<vpRGBa> &I, const int scale, const int scaleDiv,
   \param scaleDiv : Specifies the number of iterations of the multiscale filter.
   Values larger than 2 exploit the "multiscale" nature of the algorithm.
   \param level : Specifies distribution of the Gaussian blurring kernel sizes for Scale division values > 2:
-    0
-        tends to treat all image intensities similarly,
-    1
-        enhances dark regions of the image,
-    2
-        enhances the bright regions of the image.
+    - 0, tends to treat all image intensities similarly,
+    - 1, enhances dark regions of the image,
+    - 2, enhances the bright regions of the image.
   \param dynamic : Adjusts the color of the result. Large values produce less saturated images.
   \param kernelSize : Kernel size for the gaussian blur operation. If -1, the kernel size is calculated from the image size.
 */
@@ -269,10 +267,3 @@ void vp::retinex(const vpImage<vpRGBa> &I1, vpImage<vpRGBa> &I2, const int scale
   I2 = I1;
   MSRCR(I2, scale, scaleDiv, level, dynamic, kernelSize);
 }
-
-
-/*
- * Local variables:
- * c-basic-offset: 2
- * End:
- */

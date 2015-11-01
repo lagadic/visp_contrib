@@ -48,6 +48,8 @@
 
 
 /*!
+  \ingroup group_imgproc_brightness
+
   Adjust the brightness of a grayscale image such as the new intensity is alpha x old_intensity + beta.
 
   \param I : The grayscale image to adjust the brightness.
@@ -66,6 +68,8 @@ void vp::adjust(vpImage<unsigned char> &I, const double alpha, const double beta
 }
 
 /*!
+  \ingroup group_imgproc_brightness
+
   Adjust the brightness of a grayscale image such as the new intensity is alpha x old_intensity + beta.
 
   \param I1 : The original grayscale image.
@@ -81,6 +85,8 @@ void vp::adjust(const vpImage<unsigned char> &I1, vpImage<unsigned char> &I2, co
 }
 
 /*!
+  \ingroup group_imgproc_brightness
+
   Adjust the brightness of a color image such as the new intensity is alpha x old_intensity + beta.
 
   \param I : The color image to adjust the brightness.
@@ -102,6 +108,8 @@ void vp::adjust(vpImage<vpRGBa> &I, const double alpha, const double beta) {
 }
 
 /*!
+  \ingroup group_imgproc_brightness
+
   Adjust the brightness of a color image such as the new intensity is alpha x old_intensity + beta.
 
   \param I1 : The original color image.
@@ -117,6 +125,8 @@ void vp::adjust(const vpImage<vpRGBa> &I1, vpImage<vpRGBa> &I2, const double alp
 }
 
 /*!
+  \ingroup group_imgproc_histogram
+
   Adjust the contrast of a grayscale image by performing an histogram equalization.
   The intensity distribution is redistributed over the full [0 - 255] range such as the cumulative histogram
   distribution becomes linear.
@@ -162,6 +172,8 @@ void vp::equalizeHistogram(vpImage<unsigned char> &I) {
 }
 
 /*!
+  \ingroup group_imgproc_histogram
+
   Adjust the contrast of a grayscale image by performing an histogram equalization.
   The intensity distribution is redistributed over the full [0 - 255] range such as the cumulative histogram
   distribution becomes linear.
@@ -175,6 +187,8 @@ void vp::equalizeHistogram(const vpImage<unsigned char> &I1, vpImage<unsigned ch
 }
 
 /*!
+  \ingroup group_imgproc_histogram
+
   Adjust the contrast of a color image by performing an histogram equalization.
   The intensity distribution is redistributed over the full [0 - 255] range such as the cumulative histogram
   distribution becomes linear.
@@ -244,6 +258,8 @@ void vp::equalizeHistogram(vpImage<vpRGBa> &I, const bool useHSV) {
 }
 
 /*!
+  \ingroup group_imgproc_histogram
+
   Adjust the contrast of a color image by performing an histogram equalization.
   The intensity distribution is redistributed over the full [0 - 255] range such as the cumulative histogram
   distribution becomes linear.
@@ -259,6 +275,8 @@ void vp::equalizeHistogram(const vpImage<vpRGBa> &I1, vpImage<vpRGBa> &I2, const
 }
 
 /*!
+  \ingroup group_imgproc_gamma
+
   Perform a gamma correction on a grayscale image.
 
   \param I : The grayscale image to apply gamma correction.
@@ -282,6 +300,8 @@ void vp::gammaCorrection(vpImage<unsigned char> &I, const double gamma) {
 }
 
 /*!
+  \ingroup group_imgproc_gamma
+
   Perform a gamma correction on a grayscale image.
 
   \param I1 : The first grayscale image.
@@ -294,6 +314,8 @@ void vp::gammaCorrection(const vpImage<unsigned char> &I1, vpImage<unsigned char
 }
 
 /*!
+  \ingroup group_imgproc_gamma
+
   Perform a gamma correction on a color image.
 
   \param I : The color image to apply gamma correction.
@@ -320,6 +342,8 @@ void vp::gammaCorrection(vpImage<vpRGBa> &I, const double gamma) {
 }
 
 /*!
+  \ingroup group_imgproc_gamma
+
   Perform a gamma correction on a color image.
 
   \param I1 : The first color image.
@@ -332,6 +356,8 @@ void vp::gammaCorrection(const vpImage<vpRGBa> &I1, vpImage<vpRGBa> &I2, const d
 }
 
 /*!
+  \ingroup group_imgproc_contrast
+
   Stretch the contrast of a grayscale image.
 
   \param I : The grayscale image to stretch the contrast.
@@ -357,6 +383,8 @@ void vp::stretchContrast(vpImage<unsigned char> &I) {
 }
 
 /*!
+  \ingroup group_imgproc_contrast
+
   Stretch the contrast of a grayscale image.
 
   \param I1 : The first input grayscale image.
@@ -369,6 +397,8 @@ void vp::stretchContrast(const vpImage<unsigned char> &I1, vpImage<unsigned char
 }
 
 /*!
+  \ingroup group_imgproc_contrast
+
   Stretch the contrast of a color image.
 
   \param I : The color image to stretch the contrast.
@@ -445,6 +475,8 @@ void vp::stretchContrast(vpImage<vpRGBa> &I) {
 }
 
 /*!
+  \ingroup group_imgproc_contrast
+
   Stretch the contrast of a color image.
 
   \param I1 : The first input color image.
@@ -457,6 +489,8 @@ void vp::stretchContrast(const vpImage<vpRGBa> &I1, vpImage<vpRGBa> &I2) {
 }
 
 /*!
+  \ingroup group_imgproc_contrast
+
   Stretch the contrast of a color image in the HSV color space.
   The saturation and value components are stretch so the hue is preserved.
 
@@ -504,6 +538,8 @@ void vp::stretchContrastHSV(vpImage<vpRGBa> &I) {
 }
 
 /*!
+  \ingroup group_imgproc_contrast
+
   Stretch the contrast of a color image in the HSV color space.
   The saturation and value components are stretch so the hue is preserved.
 
@@ -517,6 +553,8 @@ void vp::stretchContrastHSV(const vpImage<vpRGBa> &I1, vpImage<vpRGBa> &I2) {
 }
 
 /*!
+  \ingroup group_imgproc_sharpening
+
   Sharpen a grayscale image using the unsharp mask technique.
 
   \param I : The grayscale image to sharpen.
@@ -538,6 +576,8 @@ void vp::unsharpMask(vpImage<unsigned char> &I, const unsigned int size, const d
 }
 
 /*!
+  \ingroup group_imgproc_sharpening
+
   Sharpen a grayscale image using the unsharp mask technique.
 
   \param I1 : The first input grayscale image.
@@ -552,6 +592,8 @@ void vp::unsharpMask(const vpImage<unsigned char> &I1, vpImage<unsigned char> &I
 }
 
 /*!
+  \ingroup group_imgproc_sharpening
+
   Sharpen a color image using the unsharp mask technique.
 
   \param I : The color image to sharpen.
@@ -583,6 +625,8 @@ void vp::unsharpMask(vpImage<vpRGBa> &I, const unsigned int size, const double w
 }
 
 /*!
+  \ingroup group_imgproc_sharpening
+
   Sharpen a color image using the unsharp mask technique.
 
   \param I1 : The first input color image.
@@ -595,10 +639,3 @@ void vp::unsharpMask(const vpImage<vpRGBa> &I1, vpImage<vpRGBa> &I2, const unsig
   I2 = I1;
   vp::unsharpMask(I2, size, weight);
 }
-
-
-/*
- * Local variables:
- * c-basic-offset: 2
- * End:
- */
