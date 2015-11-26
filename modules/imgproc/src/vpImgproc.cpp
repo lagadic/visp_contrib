@@ -144,9 +144,15 @@ void vp::equalizeHistogram(vpImage<unsigned char> &I) {
 
   //Calculate the cumulative distribution function
   unsigned int cdf[256];
-  unsigned int cdfMin = std::numeric_limits<unsigned int>::max(), cdfMax = 0;
-  unsigned int minValue = std::numeric_limits<unsigned int>::max(), maxValue = 0;
+  unsigned int cdfMin = /*std::numeric_limits<unsigned int>::max()*/ UINT_MAX, cdfMax = 0;
+  unsigned int minValue = /*std::numeric_limits<unsigned int>::max()*/ UINT_MAX, maxValue = 0;
   cdf[0] = hist[0];
+  
+  if(cdf[0] < cdfMin && cdf[0] > 0) {
+    cdfMin = cdf[0];
+    minValue = 0;
+  }
+  
   for(unsigned int i = 1; i < 256; i++) {
     cdf[i] = cdf[i-1] + hist[i];
 
@@ -160,10 +166,15 @@ void vp::equalizeHistogram(vpImage<unsigned char> &I) {
       maxValue = i;
     }
   }
+  
+  unsigned int nbPixels = I.getWidth()*I.getHeight();
+  if(nbPixels == cdfMin) {
+    //Only one brightness value in the image
+    return;
+  }
 
   //Construct the look-up table
   unsigned char lut[256];
-  unsigned int nbPixels = I.getWidth()*I.getHeight();
   for(unsigned int x = minValue; x <= maxValue; x++) {
     lut[x] = vpMath::round( (cdf[x]-cdfMin) / (double) (nbPixels-cdfMin) * 255.0 );
   }
@@ -191,7 +202,7 @@ void vp::equalizeHistogram(const vpImage<unsigned char> &I1, vpImage<unsigned ch
 
   Adjust the contrast of a color image by performing an histogram equalization.
   The intensity distribution is redistributed over the full [0 - 255] range such as the cumulative histogram
-  distribution becomes linear.
+  distribution becomes linear. The alpha channel is ignored / copied from the source alpha channel.
 
   \param I : The color image to apply histogram equalization.
   \param useHSV : If true, the histogram equalization is performed on the value channel (in HSV space), otherwise
@@ -212,9 +223,9 @@ void vp::equalizeHistogram(vpImage<vpRGBa> &I, const bool useHSV) {
     vpImageConvert::split(I, &pR, &pG, &pB, &pa);
 
     //Apply histogram equalization for each channel
-    vp::equalizeHistogram(pR, pR);
-    vp::equalizeHistogram(pG, pG);
-    vp::equalizeHistogram(pB, pB);
+    vp::equalizeHistogram(pR);
+    vp::equalizeHistogram(pG);
+    vp::equalizeHistogram(pB);
 
     //Merge the result in I
     unsigned int size = I.getWidth()*I.getHeight();
@@ -262,7 +273,7 @@ void vp::equalizeHistogram(vpImage<vpRGBa> &I, const bool useHSV) {
 
   Adjust the contrast of a color image by performing an histogram equalization.
   The intensity distribution is redistributed over the full [0 - 255] range such as the cumulative histogram
-  distribution becomes linear.
+  distribution becomes linear. The alpha channel is ignored / copied from the source alpha channel.
 
   \param I1 : The first color image.
   \param I2 : The second color image after histogram equalization.
