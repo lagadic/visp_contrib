@@ -41,6 +41,7 @@
 */
 
 #include <numeric>
+#include <functional>
 
 #include <visp3/imgproc/vpImgproc.h>
 #include <visp3/core/vpMath.h>
@@ -106,7 +107,7 @@ void MSRCR(vpImage<vpRGBa> &I, const int _scale, const int scaleDiv,
   int kernelSize = _kernelSize;
   if(kernelSize == -1) {
     //Compute the kernel size from the input image size
-    kernelSize = std::min(I.getWidth(), I.getHeight()) / 2.0;
+    kernelSize = (int) (std::min(I.getWidth(), I.getHeight()) / 2.0);
     kernelSize = (kernelSize - kernelSize%2) + 1;
   }
 
