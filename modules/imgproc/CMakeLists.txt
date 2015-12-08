@@ -36,14 +36,18 @@
 #############################################################################
 
 vp_add_module(imgproc visp_core)
+
+# You can add cmake specific material like Find<Package>.cmake files in a specific
+# folder named for example "cmake" and uncomment the following line to use it.
+# vp_add_cmake_module_path(cmake)
+
+# You can add specific headers that are dynamically configured in
+# the include folder of the module. Create for example the file
+# cmake/templates/vpConfigImproc.h.in and uncomment the following line.
+# vp_add_config_file(cmake/templates/vpConfigImproc.h.in)
+
 vp_glob_module_sources()
 vp_module_include_directories()
 vp_create_module()
 
-if (CMAKE_VERSION VERSION_LESS 2.8.12)
-  vp_add_tests(
-    SOURCES_EXCLUDE
-    DEPENDS_ON visp_imgproc visp_io)
-else()
-  vp_add_tests(DEPENDS_ON visp_imgproc visp_io)
-endif()
+vp_add_tests(DEPENDS_ON visp_imgproc visp_io)
