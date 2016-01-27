@@ -167,6 +167,8 @@ public:
 
   void setCamera(const unsigned int &index);
   void setCamera(const FlyCapture2::PGRGuid &guid);
+  void setVideoModeAndFrameRate(const FlyCapture2::VideoMode videoMode,
+                                const FlyCapture2::FrameRate &frameRate);
 
 protected:
   void open();

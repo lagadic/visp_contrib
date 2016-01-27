@@ -60,6 +60,7 @@ int main()
     vpImage<unsigned char> I;
 
     g.setCamera(0);
+    g.setVideoModeAndFrameRate(FlyCapture2::VIDEOMODE_1280x960Y8, FlyCapture2::FRAMERATE_60);
     g.open(I);
     g.getCameraInfo(std::cout);
 

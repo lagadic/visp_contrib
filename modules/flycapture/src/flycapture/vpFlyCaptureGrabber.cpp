@@ -158,6 +158,55 @@ void vpFlyCaptureGrabber::setCamera(const FlyCapture2::PGRGuid &guid)
 }
 
 /*!
+  Set video mode and framerate of the active camera.
+  \param videoMode : Camera video mode.
+  \param frameRate : Camera frame rate.
+
+  The following example shows how to use this function to set the camera image resolution to
+  1280 x 960, pixel format to Y8 and capture framerate to 60 fps.
+  \code
+#include <visp3/core/vpImage.h>
+#include <visp3/io/vpImageIo.h>
+#include <visp3/flycapture/vpFlyCaptureGrabber.h>
+
+int main()
+{
+#if defined(VISP_HAVE_FLYCAPTURE)
+  try {
+    int nframes = 100;
+    vpImage<unsigned char> I;
+    vpFlyCaptureGrabber g;
+
+    g.setCamera(0); // Default camera is the first on the bus
+    g.setVideoModeAndFrameRate(FlyCapture2::VIDEOMODE_1280x960Y8, FlyCapture2::FRAMERATE_60);
+    g.open(I);
+    g.getCameraInfo(std::cout);
+
+    for(int i=0; i< nframes; i++) {
+      g.acquire(I);
+    }
+  }
+  catch(vpException &e) {
+    std::cout << "Catch an exception: " << e.getStringMessage() << std::endl;
+  }
+#endif
+}
+  \endcode
+ */
+void vpFlyCaptureGrabber::setVideoModeAndFrameRate(const FlyCapture2::VideoMode videoMode,
+                                                   const FlyCapture2::FrameRate &frameRate)
+{
+  open();
+
+  FlyCapture2::Error error;
+  error = m_camera.SetVideoModeAndFrameRate(videoMode, frameRate);
+  if (error != FlyCapture2::PGRERROR_OK) {
+    error.PrintErrorTrace();
+    throw (vpException(vpException::fatalError, "Cannot set video mode and framerate.") );
+  }
+}
+
+/*!
    Stop active camera capturing images and disconnect the active camera.
    If you want to use again this camera, you may call setCamera(const unsigned int &)
    and open(vpImage<unsigned char> &) or open(vpImage<vpRGBa> &) to connect again the camera.
@@ -232,7 +281,7 @@ void vpFlyCaptureGrabber::acquire(vpImage<unsigned char> &I, FlyCapture2::TimeSt
   width = convertedImage.GetCols();
   unsigned char *data = convertedImage.GetData();
   I.resize(height, width);
-  memcpy(I.bitmap, data, height, width);
+  memcpy(I.bitmap, data, height*width);
 }
 
 /*!
