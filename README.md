@@ -9,13 +9,17 @@ So, all the new modules should be developed separately, and published in the [vi
 You can build ViSP, so it will include the modules from this repository. Here is the CMake command:
 
 ```
-$ cd <visp_build_directory>
-$ cmake -DVISP_CONTRIB_MODULES_PATH=<visp_contrib>/modules <visp_source_directory>
+$ cd <parent_dir>
+$ git clone https://github.com/lagadic/visp.git
+$ git clone https://github.com/lagadic/visp_contrib.git
+$ mkdir visp-build
+$ cd visp-build
+$ cmake -DVISP_CONTRIB_MODULES_PATH=../visp_contrib/modules ../visp
 $ make -j4
 ```
 
-As the result, ViSP will be built in the <visp_build_directory> with all modules from visp_contrib repository. If you don't want all of the modules, use CMake's BUILD_visp_* options. Like in this example:
+As the result, ViSP will be built in the <parent_dir>/visp-build with all modules from visp and from visp_contrib repositories. If you don't want all of the modules, use CMake's BUILD_visp_* options. Like in this example:
 
 ```
-$ cmake -DVISP_CONTRIB_MODULES_PATH=<visp_contrib>/modules -DBUILD_visp_ar=OFF <visp_source_directory>
+$ cmake -DVISP_CONTRIB_MODULES_PATH=../visp_contrib/modules -DBUILD_visp_ar=OFF ../visp
 ```
