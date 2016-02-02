@@ -41,6 +41,8 @@
   Test PointGrey FlyCapture SDK wrapper to capture and display images.
 */
 
+#include <iomanip>
+
 #include <visp3/core/vpImage.h>
 #include <visp3/gui/vpDisplayX.h>
 #include <visp3/gui/vpDisplayGDI.h>
@@ -59,10 +61,12 @@ int main()
     vpFlyCaptureGrabber g;
     vpImage<unsigned char> I;
 
-    g.setCamera(0);
-    g.setVideoModeAndFrameRate(FlyCapture2::VIDEOMODE_1280x960Y8, FlyCapture2::FRAMERATE_60);
+    g.setCameraIndex(0);
+
     g.open(I);
     g.getCameraInfo(std::cout);
+
+    std::cout << "Frame rate is " << std::fixed << std::setprecision(3) << g.getFrameRate() << " fps" << std::endl;
 
 #if defined(VISP_HAVE_X11)
     vpDisplayX d(I);

@@ -72,27 +72,21 @@ int main()
 {
 #if defined(VISP_HAVE_FLYCAPTURE)
   try {
-    int nframes = 100;
-    vpImage<unsigned char> I;
-    char filename[255];
-    std::cout << "Number of cameras detected: " << vpFlyCaptureGrabber::getNumCameras() << std::endl;
+  int nframes = 100;
+  vpImage<unsigned char> I;
+  char filename[255];
+  vpFlyCaptureGrabber g;
+  std::cout << "Number of cameras detected: " << g.getNumCameras() << std::endl;
 
-    vpFlyCaptureGrabber g;
-    g.setCamera(0); // Default camera is the first on the bus
-    g.open(I);
-    g.getCameraInfo(std::cout);
+  g.setCameraIndex(0); // Default camera is the first on the bus
+  g.open(I);
+  g.getCameraInfo(std::cout);
 
-    for(int i=0; i< nframes; i++) {
-      g.acquire(I);
-      sprintf(filename, "image%04d.pgm", i);
-      vpImageIo::write(I, filename);
-    }
+  for(int i=0; i< nframes; i++) {
+    g.acquire(I);
+    sprintf(filename, "image%04d.pgm", i);
+    vpImageIo::write(I, filename);
   }
-  catch(vpException &e) {
-    std::cout << "Catch an exception: " << e.getStringMessage() << std::endl;
-  }
-#else
-  std::cout << "You should install PointGrey FlyCapture SDK to use this binary..." << std::endl;
 #endif
 }
   \endcode
@@ -111,36 +105,29 @@ int main()
 int main()
 {
 #if defined(VISP_HAVE_FLYCAPTURE)
-  try {
-    int nframes = 100;
-    char filename[255];
-    unsigned int numCameras = vpFlyCaptureGrabber::getNumCameras();
+  int nframes = 100;
+  char filename[255];
+  unsigned int numCameras = vpFlyCaptureGrabber::getNumCameras();
 
-    std::cout << "Number of cameras detected: " << numCameras << std::endl;
+  std::cout << "Number of cameras detected: " << numCameras << std::endl;
 
-    vpFlyCaptureGrabber *g = new vpFlyCaptureGrabber [numCameras];
-    std::vector< vpImage<unsigned char> > I(numCameras);
+  vpFlyCaptureGrabber *g = new vpFlyCaptureGrabber [numCameras];
+  std::vector< vpImage<unsigned char> > I(numCameras);
 
+  for(unsigned int cam=0; cam < numCameras; cam++) {
+    g[cam].setCameraIndex(cam); // Default camera is the first on the bus
+    g[cam].open(I[cam]);
+    g[cam].getCameraInfo(std::cout);
+  }
+
+  for(int i=0; i< nframes; i++) {
     for(unsigned int cam=0; cam < numCameras; cam++) {
-      g[cam].setCamera(cam); // Default camera is the first on the bus
-      g[cam].open(I[cam]);
-      g[cam].getCameraInfo(std::cout);
+      g[cam].acquire(I[cam]);
+      sprintf(filename, "image-camera%d-%04d.pgm", cam, i);
+      vpImageIo::write(I[cam], filename);
     }
-
-    for(int i=0; i< nframes; i++) {
-      for(unsigned int cam=0; cam < numCameras; cam++) {
-        g[cam].acquire(I[cam]);
-        sprintf(filename, "image-camera%d-%04d.pgm", cam, i);
-        vpImageIo::write(I[cam], filename);
-      }
-    }
-    delete [] g;
   }
-  catch(vpException &e) {
-    std::cout << "Catch an exception: " << e.getStringMessage() << std::endl;
-  }
-#else
-  std::cout << "You should install PointGrey FlyCapture SDK to use this binary..." << std::endl;
+  delete [] g;
 #endif
 }
   \endcode
@@ -157,18 +144,38 @@ public:
   void acquire(vpImage<vpRGBa> &I, FlyCapture2::TimeStamp &timestamp);
 
   void close();
+  void connect();
+  void disconnect();
 
   std::ostream &getCameraInfo(std::ostream & os); // Cannot be const since FlyCapture2::Camera::GetCameraInfo() isn't
-  FlyCapture2::PGRGuid getGuid(const unsigned int &index) const;
+  FlyCapture2::Camera *getCameraHandler();
+  /*! Return the index of the active camera. */
+  unsigned int getCameraIndex() const {
+   return m_index;
+  };
+  static unsigned int getCameraSerial(const unsigned int &index);
+
+  float getFrameRate();
   static unsigned int getNumCameras();
 
+  //! Return true if the camera is connected.
+  bool isConnected() const {
+    return m_connected;
+  }
+  //! Return true if the camera capture is started.
+  bool isCaptureStarted() const {
+    return m_capture;
+  }
   void open(vpImage<unsigned char> &I);
   void open(vpImage<vpRGBa> &I);
 
-  void setCamera(const unsigned int &index);
-  void setCamera(const FlyCapture2::PGRGuid &guid);
+  void setCameraIndex(const unsigned int &index);
+  void setCameraSerial(const unsigned int &serial);
   void setVideoModeAndFrameRate(const FlyCapture2::VideoMode videoMode,
                                 const FlyCapture2::FrameRate &frameRate);
+
+  void startCapture();
+  void stopCapture();
 
 protected:
   void open();
@@ -179,6 +186,8 @@ protected:
   unsigned int m_index; //!< Active camera index
   unsigned int m_numCameras; //!< Number of connected cameras
   FlyCapture2::Image m_rawImage; //!< Image buffer
+  bool m_connected; //!< true if camera connected
+  bool m_capture; //!< true is capture started
 };
 
 #endif
