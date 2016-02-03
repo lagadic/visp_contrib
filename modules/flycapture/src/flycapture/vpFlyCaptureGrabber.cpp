@@ -45,6 +45,8 @@
 
 #ifdef VISP_HAVE_FLYCAPTURE
 
+#include <visp3/core/vpTime.h>
+
 /*!
    Default constructor that consider the first camera found on the bus as active.
  */
@@ -179,6 +181,8 @@ int main()
 */
 FlyCapture2::Camera *vpFlyCaptureGrabber::getCameraHandler()
 {
+  this->connect();
+
   if (m_connected == true) {
     return &m_camera;
   }
@@ -196,29 +200,29 @@ FlyCapture2::Camera *vpFlyCaptureGrabber::getCameraHandler()
   vpFlyCaptureGrabber g;
   g.setCameraIndex(0);
   g.connect();
-  std::cout << "Frame rate is " << std::fixed << std::setprecision(3) << g.getFrameRate() << " fps" << std::endl;
+  std::cout << "Frame rate: " << std::fixed << std::setprecision(3) << g.getFrameRate() << " fps" << std::endl;
   \endcode
+
+  \sa setFrameRate()
  */
 float vpFlyCaptureGrabber::getFrameRate()
 {
-  // Check if the camera supports the FRAME_RATE property
-  FlyCapture2::Error error;
-  FlyCapture2::PropertyInfo propInfo;
-  propInfo.type = FlyCapture2::FRAME_RATE;
-  error = m_camera.GetPropertyInfo( &propInfo );
-  if (error != FlyCapture2::PGRERROR_OK) {
-    error.PrintErrorTrace();
-    throw (vpException(vpException::fatalError,
-                       "Cannot get camera framerate. Do you connect the camera using connect() or open() ?") );
-  }
+  try {
+    this->connect();
 
-  if (propInfo.present == true) {
-    FlyCapture2::Property frmRate;
-    frmRate.type = FlyCapture2::FRAME_RATE;
-    error = m_camera.GetProperty( &frmRate );
-    return frmRate.absValue;
+    FlyCapture2::PropertyInfo propInfo;
+    propInfo = this->getPropertyInfo(FlyCapture2::FRAME_RATE);
+
+    if (propInfo.present == true) {
+      return (this->getProperty(FlyCapture2::FRAME_RATE));
+    }
+    else {
+      return -1.f;
+    }
   }
-  return -1.f;
+  catch(...) {
+    return -1.f;
+  }
 }
 
 /*!
@@ -343,6 +347,119 @@ void vpFlyCaptureGrabber::setCameraSerial(const unsigned int &serial_id)
 }
 
 /*!
+  Set camera property.
+
+  \param propType : Property type.
+  \param on : Property type.
+  \param auto_on :
+  \param value : value to set.
+ */
+void vpFlyCaptureGrabber::setProperty(const FlyCapture2::PropertyType &propType,
+                                      const bool &on, const bool &auto_on,
+                                      double value)
+{
+  this->connect();
+
+  FlyCapture2::PropertyInfo propInfo;
+  propInfo = this->getPropertyInfo(propType);
+
+  if (propInfo.present) {
+    FlyCapture2::Property prop;
+    prop.type = propType;
+    prop.onOff = on && propInfo.onOffSupported;
+    prop.autoManualMode = auto_on && propInfo.autoSupported;
+    prop.absControl = propInfo.absValSupported;
+    value = std::max<double>(std::min<double>(value, propInfo.absMax),
+                             propInfo.absMin);
+    prop.absValue = value;
+    FlyCapture2::Error error;
+    error = m_camera.SetProperty(&prop);
+    if (error != FlyCapture2::PGRERROR_OK) {
+      error.PrintErrorTrace();
+      throw (vpException(vpException::fatalError,
+                         "Cannot set property %d.",
+                         (int)propType) );
+    }
+  }
+}
+
+/*!
+  Set camera frame rate.
+  \param frameRate : Camera frame rate (fps).
+
+  The following example shows how to use this function.
+  \code
+#include <iomanip>
+#include <visp3/flycapture/vpFlyCaptureGrabber.h>
+
+int main()
+{
+#if defined(VISP_HAVE_FLYCAPTURE)
+  vpFlyCaptureGrabber g;
+  vpImage<unsigned char> I;
+
+  g.setCameraIndex(0);
+  g.setFrameRate(20); // Set framerate to 20 fps
+  std::cout << "Frame rate: " << std::fixed << std::setprecision(3) << g.getFrameRate() << " fps" << std::endl;
+
+  g.open(I);
+  while (1)
+    g.acquire(I);
+#endif
+}
+  \endcode
+ */
+void vpFlyCaptureGrabber::setFrameRate(float frameRate)
+{
+  this->connect();
+
+  this->setProperty(FlyCapture2::FRAME_RATE, true, false, frameRate);
+}
+
+/*!
+  Return property value.
+  \param propType : Property type.
+ */
+float vpFlyCaptureGrabber::getProperty(const FlyCapture2::PropertyType &propType)
+{
+  this->connect();
+
+  FlyCapture2::Property prop;
+  prop.type = propType;
+  FlyCapture2::Error error;
+  error = m_camera.GetProperty( &prop );
+  if (error != FlyCapture2::PGRERROR_OK) {
+    error.PrintErrorTrace();
+    throw (vpException(vpException::fatalError,
+                       "Cannot get property %d value.", (int)propType));
+  }
+  return prop.absValue;
+}
+
+/*!
+  Return information concerning a given property type.
+  \param propType : Property type.
+  \exception vpException::fatalError : If property type doesn't exist.
+ */
+FlyCapture2::PropertyInfo
+vpFlyCaptureGrabber::getPropertyInfo(const FlyCapture2::PropertyType &propType)
+{
+  this->connect();
+
+  FlyCapture2::PropertyInfo propInfo;
+  propInfo.type = propType;
+
+  FlyCapture2::Error error;
+  error = m_camera.GetPropertyInfo(&propInfo);
+  if (error != FlyCapture2::PGRERROR_OK) {
+    error.PrintErrorTrace();
+    throw (vpException(vpException::fatalError, "Cannot get property %d info.",
+                       (int)propType) );
+  }
+  return propInfo;
+}
+
+/*!
   Set video mode and framerate of the active camera.
   \param videoMode : Camera video mode.
   \param frameRate : Camera frame rate.
@@ -376,7 +493,7 @@ int main()
 void vpFlyCaptureGrabber::setVideoModeAndFrameRate(const FlyCapture2::VideoMode videoMode,
                                                    const FlyCapture2::FrameRate &frameRate)
 {
-  connect();
+  this->connect();
 
   FlyCapture2::Error error;
   error = m_camera.SetVideoModeAndFrameRate(videoMode, frameRate);
@@ -393,6 +510,8 @@ void vpFlyCaptureGrabber::setVideoModeAndFrameRate(const FlyCapture2::VideoMode 
  */
 void vpFlyCaptureGrabber::startCapture()
 {
+  this->connect();
+
   if (m_capture == false) {
 
     FlyCapture2::Error error;
@@ -533,7 +652,7 @@ void vpFlyCaptureGrabber::acquire(vpImage<unsigned char> &I)
 */
 void vpFlyCaptureGrabber::acquire(vpImage<unsigned char> &I, FlyCapture2::TimeStamp &timestamp)
 {
-  open();
+  this->open();
 
   FlyCapture2::Error error;
   // Retrieve an image
@@ -584,7 +703,7 @@ void vpFlyCaptureGrabber::acquire(vpImage<vpRGBa> &I)
 */
 void vpFlyCaptureGrabber::acquire(vpImage<vpRGBa> &I, FlyCapture2::TimeStamp &timestamp)
 {
-  open();
+  this->open();
 
   FlyCapture2::Error error;
   // Retrieve an image
@@ -652,6 +771,126 @@ void vpFlyCaptureGrabber::open()
 {
   this->connect();
   this->startCapture();
+}
+
+/*!
+   Return true if camera power is available, false otherwise.
+
+   \sa getCameraPower(), setCameraPowerOn(), setCameraPowerOff()
+ */
+bool vpFlyCaptureGrabber::isCameraPowerAvailable()
+{
+  this->connect();
+
+  const unsigned int powerReg = 0x400;
+  unsigned int powerRegVal = 0;
+
+  FlyCapture2::Error error;
+  error = m_camera.ReadRegister( powerReg, &powerRegVal );
+  if ( error != FlyCapture2::PGRERROR_OK ) {
+    return false;
+  }
+
+  return ( (powerRegVal & 0x00008000 ) != 0 );
+}
+
+/*!
+  Return true if the camera is powered on, false otherwise
+
+  \sa setCameraPower()
+ */
+bool vpFlyCaptureGrabber::getCameraPower()
+{
+  if ( ! isCameraPowerAvailable() )
+    return false;
+  const unsigned int powerReg = 0x610;
+  unsigned int powerRegVal = 0 ;
+
+  FlyCapture2::Error error;
+  error = m_camera.ReadRegister( powerReg, &powerRegVal );
+  if ( error != FlyCapture2::PGRERROR_OK ) {
+    return false;
+  }
+
+  return ( (powerRegVal & (0x1 << 31)) != 0 );
+}
+
+/*!
+  Power on/off the camera.
+
+  \param on : true to power on the camera, false to power off the camera.
+
+  The following example shows how to turn off a camera.
+  \code
+#include <visp3/flycapture/vpFlyCaptureGrabber.h>
+
+int main()
+{
+#if defined(VISP_HAVE_FLYCAPTURE)
+  vpFlyCaptureGrabber g;
+
+  g.setCameraIndex(0);
+  g.connect();
+
+  bool power = g.getCameraPower();
+  std::cout << "Camera is powered: " << ((power == true) ? "on" : "off") << std::endl;
+
+  if (power)
+    g.setCameraPower(false); // Power off the camera
+#endif
+}
+  \endcode
+
+  \sa getCameraPower()
+ */
+void vpFlyCaptureGrabber::setCameraPower(const bool &on)
+{
+  this->connect();
+
+  if ( ! isCameraPowerAvailable() ) {
+    throw (vpException(vpException::badValue,
+                       "Cannot power on camera. Feature not available") );
+  }
+
+  // Power on the camera
+  const unsigned int powerReg = 0x610;
+  unsigned int powerRegVal = 0;
+
+  powerRegVal = (on == true) ? 0x80000000 : 0x0;
+
+  FlyCapture2::Error error;
+  error  = m_camera.WriteRegister( powerReg, powerRegVal );
+  if (error != FlyCapture2::PGRERROR_OK) {
+    error.PrintErrorTrace();
+    throw (vpException(vpException::fatalError, "Cannot power on the camera.") );
+  }
+
+  const unsigned int millisecondsToSleep = 100;
+  unsigned int regVal = 0;
+  unsigned int retries = 10;
+
+  // Wait for camera to complete power-up
+  do
+  {
+    vpTime::wait(millisecondsToSleep);
+    error = m_camera.ReadRegister(powerReg, &regVal);
+    if (error == FlyCapture2::PGRERROR_TIMEOUT) {
+      // ignore timeout errors, camera may not be responding to
+      // register reads during power-up
+    }
+    else if (error != FlyCapture2::PGRERROR_OK) {
+      error.PrintErrorTrace();
+      throw (vpException(vpException::fatalError, "Cannot power on the camera.") );
+    }
+
+    retries--;
+  } while ((regVal & powerRegVal) == 0 && retries > 0);
+
+  // Check for timeout errors after retrying
+  if (error == FlyCapture2::PGRERROR_TIMEOUT) {
+    error.PrintErrorTrace();
+    throw (vpException(vpException::fatalError, "Cannot power on the camera. Timeout occur") );
+  }
 }
 
 #else

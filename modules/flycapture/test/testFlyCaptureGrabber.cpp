@@ -62,7 +62,7 @@ int main()
     vpImage<unsigned char> I;
 
     g.setCameraIndex(0);
-
+    g.setFrameRate(20);
     g.open(I);
     g.getCameraInfo(std::cout);
 

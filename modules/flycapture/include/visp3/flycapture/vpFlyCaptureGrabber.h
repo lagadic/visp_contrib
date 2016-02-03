@@ -57,9 +57,14 @@
 
   Allows to grab images from a PointGrey camera using FlyCapture SDK.
 
-  To use this class install first FlyCapture that could be downloaded
-  from https://www.ptgrey.com/support/downloads, and build ViSP with FlyCapture
-  support.
+  To use this class install first FlyCapture SDK https://www.ptgrey.com/flycapture-sdk.
+  \note To install FlyCapture SDK on linux follow https://www.ptgrey.com/tan/10548.
+  \note For specific details about using FlyCapture and Linux with a USB 3.0 camera, see http://www.ptgrey.com/KB/10685.
+
+  Once installed configure ViSP using cmake to detect FlyCapture SDK and build ViSP to include
+  FlyCapture SDK support.
+
+  This class was tested with Flea3 USB 3.0 cameras (FL3-U3-32S2M-CS, FL3-U3-13E4C-C).
 
   The following example shows how to use this class to capture images
   from the first camera that is found.
@@ -153,6 +158,7 @@ public:
   unsigned int getCameraIndex() const {
    return m_index;
   };
+  bool getCameraPower();
   static unsigned int getCameraSerial(const unsigned int &index);
 
   float getFrameRate();
@@ -169,8 +175,15 @@ public:
   void open(vpImage<unsigned char> &I);
   void open(vpImage<vpRGBa> &I);
 
+  void powerOn();
+  void powerOff();
+
   void setCameraIndex(const unsigned int &index);
+  void setCameraPower(const bool &on);
   void setCameraSerial(const unsigned int &serial);
+  void setFrameRate(float frameRate);
+  void setProperty(const FlyCapture2::PropertyType &propType,
+                   const bool &on, const bool &auto_on, double value);
   void setVideoModeAndFrameRate(const FlyCapture2::VideoMode videoMode,
                                 const FlyCapture2::FrameRate &frameRate);
 
@@ -178,6 +191,9 @@ public:
   void stopCapture();
 
 protected:
+  float getProperty(const FlyCapture2::PropertyType &propType);
+  FlyCapture2::PropertyInfo getPropertyInfo(const FlyCapture2::PropertyType &propType);
+  bool isCameraPowerAvailable();
   void open();
 
 protected:
