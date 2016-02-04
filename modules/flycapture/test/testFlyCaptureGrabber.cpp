@@ -62,7 +62,17 @@ int main()
     vpImage<unsigned char> I;
 
     g.setCameraIndex(0);
-    g.setFrameRate(20);
+//    g.setFrameRate(20);
+    bool shutter_mode = true;
+    float shutter_value = 10;
+    g.setShutter(shutter_mode, shutter_value);
+    std::cout << "Shutter " << ((shutter_mode == true) ? "auto" : "manual") << " value: " << shutter_value << std::endl;
+
+    bool gain_mode = true;
+    float gain_db = 10;
+    g.setGain(gain_mode, gain_db);
+    std::cout << "Gain " << ((gain_mode == true) ? "auto" : "manual") << " value: " << gain_db << std::endl;
+
     g.open(I);
     g.getCameraInfo(std::cout);
 

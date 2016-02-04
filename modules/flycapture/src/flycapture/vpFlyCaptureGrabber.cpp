@@ -120,8 +120,8 @@ int main()
 #if defined(VISP_HAVE_FLYCAPTURE)
   int nframes = 100;
   vpImage<unsigned char> I;
-  vpFlyCaptureGrabber g;
 
+  vpFlyCaptureGrabber g;
   g.connect();
   FlyCapture2::Camera *handler = g.getCameraHandler();
   bool supported = false;
@@ -214,7 +214,8 @@ float vpFlyCaptureGrabber::getFrameRate()
     propInfo = this->getPropertyInfo(FlyCapture2::FRAME_RATE);
 
     if (propInfo.present == true) {
-      return (this->getProperty(FlyCapture2::FRAME_RATE));
+      FlyCapture2::Property prop = this->getProperty(FlyCapture2::FRAME_RATE);
+      return (prop.absValue);
     }
     else {
       return -1.f;
@@ -315,8 +316,8 @@ int main()
 #if defined(VISP_HAVE_FLYCAPTURE)
   int nframes = 100;
   vpImage<unsigned char> I;
-  vpFlyCaptureGrabber g;
 
+  vpFlyCaptureGrabber g;
   g.setCameraSerial(15290004); // Set camera with serial id
   g.open(I);
   g.getCameraInfo(std::cout);
@@ -350,8 +351,8 @@ void vpFlyCaptureGrabber::setCameraSerial(const unsigned int &serial_id)
   Set camera property.
 
   \param propType : Property type.
-  \param on : Property type.
-  \param auto_on :
+  \param on : true to turn property on.
+  \param auto_on : true to turn on auto mode, false to turn manual mode.
   \param value : value to set.
  */
 void vpFlyCaptureGrabber::setProperty(const FlyCapture2::PropertyType &propType,
@@ -385,7 +386,7 @@ void vpFlyCaptureGrabber::setProperty(const FlyCapture2::PropertyType &propType,
 
 /*!
   Set camera frame rate.
-  \param frameRate : Camera frame rate (fps).
+  \param frame_rate [in/out] : Camera frame rate (fps).
 
   The following example shows how to use this function.
   \code
@@ -395,11 +396,13 @@ void vpFlyCaptureGrabber::setProperty(const FlyCapture2::PropertyType &propType,
 int main()
 {
 #if defined(VISP_HAVE_FLYCAPTURE)
-  vpFlyCaptureGrabber g;
   vpImage<unsigned char> I;
 
+  vpFlyCaptureGrabber g;
   g.setCameraIndex(0);
-  g.setFrameRate(20); // Set framerate to 20 fps
+  float framerate = 20;
+  g.setFrameRate(framerate); // Set framerate to 20 fps
+  std::cout << "Frame rate: " << std::fixed << std::setprecision(3) << framerate << " fps" << std::endl;
   std::cout << "Frame rate: " << std::fixed << std::setprecision(3) << g.getFrameRate() << " fps" << std::endl;
 
   g.open(I);
@@ -408,61 +411,153 @@ int main()
 #endif
 }
   \endcode
+
+  \sa getFramerate()
  */
-void vpFlyCaptureGrabber::setFrameRate(float frameRate)
+void vpFlyCaptureGrabber::setFrameRate(float &frame_rate)
 {
   this->connect();
 
-  this->setProperty(FlyCapture2::FRAME_RATE, true, false, frameRate);
+  this->setProperty(FlyCapture2::FRAME_RATE, true, false, frame_rate);
+  FlyCapture2::Property prop = this->getProperty(FlyCapture2::FRAME_RATE);
+  frame_rate = prop.absValue;
 }
 
 /*!
-  Return property value.
-  \param propType : Property type.
+  Set camera shutter mode and parameter.
+  \param auto_shutter [in/out]: It true set auto shutter, if false set manual shutter applying \e shutter_ms parameter.
+  \param shutter_ms [in/out]: This is the speed at which the camera shutter opens and closes.
+
+  To turn camera auto shutter on, use the following:
+  \code
+#include <visp3/flycapture/vpFlyCaptureGrabber.h>
+
+int main()
+{
+#if defined(VISP_HAVE_FLYCAPTURE)
+  vpImage<unsigned char> I;
+
+  vpFlyCaptureGrabber g;
+  g.setCameraIndex(0);
+
+  bool shutter_mode = true;
+  float shutter_ms = 10;
+  g.setShutter(shutter_mode, shutter_ms);
+  std::cout << "Shutter " << ((shutter_mode == true) ? "auto" : "manual") << " value: " << shutter_ms << std::endl;
+
+  g.open(I);
+  ...
+#endif
+}
+  \endcode
+
+  To set camera in manual shutter mode with 8 ms as shutter speed, modify the previous code like:
+  \code
+  g.setShutter(false, 8);
+  \endcode
+
  */
-float vpFlyCaptureGrabber::getProperty(const FlyCapture2::PropertyType &propType)
+void vpFlyCaptureGrabber::setShutter(bool &auto_shutter, float &shutter_ms)
+{
+  this->connect();
+
+  this->setProperty(FlyCapture2::SHUTTER, true, auto_shutter, shutter_ms);
+  FlyCapture2::Property prop = this->getProperty(FlyCapture2::SHUTTER);
+  auto_shutter = prop.autoManualMode;
+  shutter_ms = prop.absValue;
+}
+/*!
+  Set camera gain mode and value.
+  \param auto_gain [in/out]: It true set auto gain, if false set manual gain applying \e gain_db parameter.
+  \param gain_db [in/out]: The amount of amplification that is applied to a pixel. An increase in gain
+  can result in an increase in noise.
+
+  To turn camera auto gain on, use the following:
+  \code
+#include <visp3/flycapture/vpFlyCaptureGrabber.h>
+
+int main()
+{
+#if defined(VISP_HAVE_FLYCAPTURE)
+  vpImage<unsigned char> I;
+
+  vpFlyCaptureGrabber g;
+  g.setCameraIndex(0);
+
+  bool gain_mode = true;
+  float gain_db = 5;
+  g.setGain(gain_mode, gain_db);
+  std::cout << "Gain " << ((gain_mode == true) ? "auto" : "manual") << " value: " << gain_db << std::endl;
+
+  g.open(I);
+  ...
+#endif
+}
+  \endcode
+
+  To set camera in manual gain mode with 8 db gain, modify the previous code like:
+  \code
+  g.setGain(false, 8);
+  \endcode
+
+ */
+void vpFlyCaptureGrabber::setGain(bool &auto_gain, float &gain_db)
+{
+  this->connect();
+
+  this->setProperty(FlyCapture2::SHUTTER, true, auto_gain, gain_db);
+  FlyCapture2::Property prop = this->getProperty(FlyCapture2::GAIN);
+  auto_gain = prop.autoManualMode;
+  gain_db = prop.absValue;
+}
+
+/*!
+  Return property values.
+  \param prop_type : Property type.
+ */
+FlyCapture2::Property vpFlyCaptureGrabber::getProperty(const FlyCapture2::PropertyType &prop_type)
 {
   this->connect();
 
   FlyCapture2::Property prop;
-  prop.type = propType;
+  prop.type = prop_type;
   FlyCapture2::Error error;
   error = m_camera.GetProperty( &prop );
   if (error != FlyCapture2::PGRERROR_OK) {
     error.PrintErrorTrace();
     throw (vpException(vpException::fatalError,
-                       "Cannot get property %d value.", (int)propType));
+                       "Cannot get property %d value.", (int)prop_type));
   }
-  return prop.absValue;
+  return prop;
 }
 
 /*!
   Return information concerning a given property type.
-  \param propType : Property type.
+  \param prop_type : Property type.
   \exception vpException::fatalError : If property type doesn't exist.
  */
 FlyCapture2::PropertyInfo
-vpFlyCaptureGrabber::getPropertyInfo(const FlyCapture2::PropertyType &propType)
+vpFlyCaptureGrabber::getPropertyInfo(const FlyCapture2::PropertyType &prop_type)
 {
   this->connect();
 
   FlyCapture2::PropertyInfo propInfo;
-  propInfo.type = propType;
+  propInfo.type = prop_type;
 
   FlyCapture2::Error error;
   error = m_camera.GetPropertyInfo(&propInfo);
   if (error != FlyCapture2::PGRERROR_OK) {
     error.PrintErrorTrace();
     throw (vpException(vpException::fatalError, "Cannot get property %d info.",
-                       (int)propType) );
+                       (int)prop_type) );
   }
   return propInfo;
 }
 
 /*!
   Set video mode and framerate of the active camera.
-  \param videoMode : Camera video mode.
-  \param frameRate : Camera frame rate.
+  \param video_mode : Camera video mode.
+  \param frame_rate : Camera frame rate.
 
   The following example shows how to use this function to set the camera image resolution to
   1280 x 960, pixel format to Y8 and capture framerate to 60 fps.
@@ -490,13 +585,13 @@ int main()
 }
   \endcode
  */
-void vpFlyCaptureGrabber::setVideoModeAndFrameRate(const FlyCapture2::VideoMode videoMode,
-                                                   const FlyCapture2::FrameRate &frameRate)
+void vpFlyCaptureGrabber::setVideoModeAndFrameRate(const FlyCapture2::VideoMode &video_mode,
+                                                   const FlyCapture2::FrameRate &frame_rate)
 {
   this->connect();
 
   FlyCapture2::Error error;
-  error = m_camera.SetVideoModeAndFrameRate(videoMode, frameRate);
+  error = m_camera.SetVideoModeAndFrameRate(video_mode, frame_rate);
   if (error != FlyCapture2::PGRERROR_OK) {
     error.PrintErrorTrace();
     throw (vpException(vpException::fatalError, "Cannot set video mode and framerate.") );
@@ -618,7 +713,7 @@ void vpFlyCaptureGrabber::disconnect()
    If you want to use again this camera, you may call setCamera(const unsigned int &)
    and open(vpImage<unsigned char> &) or open(vpImage<vpRGBa> &) to connect again the camera.
 
-   Similar then calling:
+   Similar then calling stopCapture() and disconnect():
    \code
    vpFlyCaptureGrabber g;
    ...

@@ -175,24 +175,23 @@ public:
   void open(vpImage<unsigned char> &I);
   void open(vpImage<vpRGBa> &I);
 
-  void powerOn();
-  void powerOff();
-
   void setCameraIndex(const unsigned int &index);
   void setCameraPower(const bool &on);
   void setCameraSerial(const unsigned int &serial);
-  void setFrameRate(float frameRate);
-  void setProperty(const FlyCapture2::PropertyType &propType,
+  void setGain(bool &auto_gain, float &gain_db);
+  void setFrameRate(float &frame_rate);
+  void setProperty(const FlyCapture2::PropertyType &prop_type,
                    const bool &on, const bool &auto_on, double value);
-  void setVideoModeAndFrameRate(const FlyCapture2::VideoMode videoMode,
-                                const FlyCapture2::FrameRate &frameRate);
+  void setShutter(bool &auto_shutter, float& shutter_ms);
+  void setVideoModeAndFrameRate(const FlyCapture2::VideoMode &video_mode,
+                                const FlyCapture2::FrameRate &frame_rate);
 
   void startCapture();
   void stopCapture();
 
 protected:
-  float getProperty(const FlyCapture2::PropertyType &propType);
-  FlyCapture2::PropertyInfo getPropertyInfo(const FlyCapture2::PropertyType &propType);
+  FlyCapture2::Property getProperty(const FlyCapture2::PropertyType &prop_type);
+  FlyCapture2::PropertyInfo getPropertyInfo(const FlyCapture2::PropertyType &prop_type);
   bool isCameraPowerAvailable();
   void open();
 
