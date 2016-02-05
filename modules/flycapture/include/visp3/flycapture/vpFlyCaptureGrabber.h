@@ -64,7 +64,10 @@
   Once installed configure ViSP using cmake to detect FlyCapture SDK and build ViSP to include
   FlyCapture SDK support.
 
-  This class was tested with Flea3 USB 3.0 cameras (FL3-U3-32S2M-CS, FL3-U3-13E4C-C).
+  This class was tested under Ubuntu and Windows with the following cameras:
+  - Flea3 USB 3.0 cameras (FL3-U3-32S2M-CS, FL3-U3-13E4C-C)
+  - Flea2 firewire camera (FL2-03S2C)
+  - Dragonfly2 firewire camera (DR2-COL)
 
   The following example shows how to use this class to capture images
   from the first camera that is found.
@@ -84,8 +87,8 @@ int main()
   std::cout << "Number of cameras detected: " << g.getNumCameras() << std::endl;
 
   g.setCameraIndex(0); // Default camera is the first on the bus
-  g.open(I);
   g.getCameraInfo(std::cout);
+  g.open(I);
 
   for(int i=0; i< nframes; i++) {
     g.acquire(I);
@@ -121,8 +124,8 @@ int main()
 
   for(unsigned int cam=0; cam < numCameras; cam++) {
     g[cam].setCameraIndex(cam); // Default camera is the first on the bus
-    g[cam].open(I[cam]);
     g[cam].getCameraInfo(std::cout);
+    g[cam].open(I[cam]);
   }
 
   for(int i=0; i< nframes; i++) {
@@ -152,20 +155,23 @@ public:
   void connect();
   void disconnect();
 
-  std::ostream &getCameraInfo(std::ostream & os); // Cannot be const since FlyCapture2::Camera::GetCameraInfo() isn't
+  float getBrightness();
+  std::ostream &getCameraInfo(std::ostream &os); // Cannot be const since FlyCapture2::Camera::GetCameraInfo() isn't
   FlyCapture2::Camera *getCameraHandler();
   /*! Return the index of the active camera. */
   unsigned int getCameraIndex() const {
    return m_index;
   };
   bool getCameraPower();
-  static unsigned int getCameraSerial(const unsigned int &index);
-
+  static unsigned int getCameraSerial(unsigned int index);
+  float getExposure();
   float getFrameRate();
   float getGain();
   static unsigned int getNumCameras();
+  float getSharpness();
   float getShutter();
 
+  bool isCameraPowerAvailable();
   //! Return true if the camera is connected.
   bool isConnected() const {
     return m_connected;
@@ -174,32 +180,41 @@ public:
   bool isCaptureStarted() const {
     return m_capture;
   }
+  bool isFormat7Supported(FlyCapture2::Mode format7_mode);
+  bool isVideoModeAndFrameRateSupported(FlyCapture2::VideoMode video_mode, FlyCapture2::FrameRate frame_rate);
   void open(vpImage<unsigned char> &I);
   void open(vpImage<vpRGBa> &I);
 
-  void setCameraIndex(const unsigned int &index);
-  void setCameraPower(const bool &on);
-  void setCameraSerial(const unsigned int &serial);
-  void setGain(bool &auto_gain, float &gain_db);
+  float setBrightness(bool brightness_auto, float brightness_value=0);
+  void setCameraIndex(unsigned int index);
+  void setCameraPower(bool on);
+  void setCameraSerial(unsigned int serial);
+  float setExposure(bool exposure_on, bool exposure_auto, float exposure_value=0);
+  float setGain(bool gain_auto, float gain_value=0);
   void setFormat7VideoMode(FlyCapture2::Mode format7_mode,
                            FlyCapture2::PixelFormat pixel_format,
                            int width, int height);
-  void setFrameRate(float &frame_rate);
-  void setProperty(const FlyCapture2::PropertyType &prop_type,
-                   const bool &on, const bool &auto_on, double value);
-  void setShutter(bool &auto_shutter, float& shutter_ms);
-  void setVideoModeAndFrameRate(const FlyCapture2::VideoMode &video_mode,
-                                const FlyCapture2::FrameRate &frame_rate);
+  float setFrameRate(float frame_rate);
+  float setSharpness(bool sharpness_on, bool sharpness_auto, float sharpness_value=0);
+  float setShutter(bool auto_shutter, float shutter_ms=10);
+  void setVideoModeAndFrameRate(FlyCapture2::VideoMode video_mode,
+                                FlyCapture2::FrameRate frame_rate);
 
   void startCapture();
   void stopCapture();
 
 protected:
+  typedef enum {
+    ABS_VALUE, //!< Consider FlyCapture2::Property::absValue
+    VALUE_A,   //!< Consider FlyCapture2::Property::valueA
+  } PropertyValue;
   std::pair<int, int> centerRoi(int size, int max_size, int step);
-  FlyCapture2::Property getProperty(const FlyCapture2::PropertyType &prop_type);
-  FlyCapture2::PropertyInfo getPropertyInfo(const FlyCapture2::PropertyType &prop_type);
-  bool isCameraPowerAvailable();
+  FlyCapture2::Property getProperty(FlyCapture2::PropertyType prop_type);
+  FlyCapture2::PropertyInfo getPropertyInfo(FlyCapture2::PropertyType prop_type);
   void open();
+  void setProperty(const FlyCapture2::PropertyType &prop_type,
+                   bool on, bool auto_on, double value,
+                   PropertyValue prop_value=ABS_VALUE);
 
 protected:
   FlyCapture2::Camera m_camera; //!< Pointer to each camera

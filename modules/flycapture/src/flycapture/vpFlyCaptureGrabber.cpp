@@ -91,13 +91,14 @@ std::ostream &vpFlyCaptureGrabber::getCameraInfo(std::ostream & os)
     error.PrintErrorTrace();
   }
 
-  os << "Serial number -" << camInfo.serialNumber << std::endl;
-  os << "Camera model - " << camInfo.modelName << std::endl;
-  os << "Camera vendor - " << camInfo.vendorName << std::endl;
-  os << "Sensor - " << camInfo.sensorInfo << std::endl;
-  os << "Resolution - " << camInfo.sensorResolution << std::endl;
-  os << "Firmware version - " << camInfo.firmwareVersion << std::endl;
-  os << "Firmware build time - " << camInfo.firmwareBuildTime << std::endl;
+  os << "Camera information:   " << std::endl;
+  os << " Serial number      : " << camInfo.serialNumber << std::endl;
+  os << " Camera model       : " << camInfo.modelName << std::endl;
+  os << " Camera vendor      : " << camInfo.vendorName << std::endl;
+  os << " Sensor             : " << camInfo.sensorInfo << std::endl;
+  os << " Resolution         : " << camInfo.sensorResolution << std::endl;
+  os << " Firmware version   : " << camInfo.firmwareVersion << std::endl;
+  os << " Firmware build time: " << camInfo.firmwareBuildTime << std::endl;
   return os;
 }
 
@@ -198,7 +199,7 @@ FlyCapture2::Camera *vpFlyCaptureGrabber::getCameraHandler()
   \code
   vpFlyCaptureGrabber g;
   g.setCameraIndex(0);
-  std::cout << "Frame rate: " << std::fixed << std::setprecision(3) << g.getFrameRate() << " fps" << std::endl;
+  std::cout << "Frame rate: " << g.getFrameRate() << " fps" << std::endl;
   \endcode
 
   \sa setFrameRate()
@@ -218,7 +219,7 @@ float vpFlyCaptureGrabber::getFrameRate()
   \code
   vpFlyCaptureGrabber g;
   g.setCameraIndex(0);
-  std::cout << "Shutter value: " << std::fixed << std::setprecision(3) << g.getShutter() << " ms" << std::endl;
+  std::cout << "Shutter value: " << g.getShutter() << " ms" << std::endl;
   \endcode
 
   \sa setShutter()
@@ -238,7 +239,7 @@ float vpFlyCaptureGrabber::getShutter()
   \code
   vpFlyCaptureGrabber g;
   g.setCameraIndex(0);
-  std::cout << "Gain value: " << std::fixed << std::setprecision(3) << g.getGain() << " ms" << std::endl;
+  std::cout << "Gain value: " << g.getGain() << " ms" << std::endl;
   \endcode
 
   \sa setGain()
@@ -248,6 +249,66 @@ float vpFlyCaptureGrabber::getGain()
   this->connect();
 
   FlyCapture2::Property prop = this->getProperty(FlyCapture2::GAIN);
+  return prop.absValue;
+}
+
+/*!
+  Return brightness value in %.
+  If the camera doesn't support brightness property, return an exception.
+
+  \code
+  vpFlyCaptureGrabber g;
+  g.setCameraIndex(0);
+  std::cout << "Brightness value: " << g.getBrightness() << " %" << std::endl;
+  \endcode
+
+  \sa setBrightness()
+ */
+float vpFlyCaptureGrabber::getBrightness()
+{
+  this->connect();
+
+  FlyCapture2::Property prop = this->getProperty(FlyCapture2::BRIGHTNESS);
+  return prop.absValue;
+}
+
+/*!
+  Return sharpness value.
+  If the camera doesn't support sharpness property, return an exception.
+
+  \code
+  vpFlyCaptureGrabber g;
+  g.setCameraIndex(0);
+  std::cout << "Sharpness value: " << g.getSharpness() << std::endl;
+  \endcode
+
+  \sa setSharpness()
+ */
+float vpFlyCaptureGrabber::getSharpness()
+{
+  this->connect();
+
+  FlyCapture2::Property prop = this->getProperty(FlyCapture2::SHARPNESS);
+  return prop.valueA;
+}
+
+/*!
+  Return exposure value.
+  If the camera doesn't support exposure property, return an exception.
+
+  \code
+  vpFlyCaptureGrabber g;
+  g.setCameraIndex(0);
+  std::cout << "Exposure value: " << g.getExposure() << std::endl;
+  \endcode
+
+  \sa setExposure()
+ */
+float vpFlyCaptureGrabber::getExposure()
+{
+  this->connect();
+
+  FlyCapture2::Property prop = this->getProperty(FlyCapture2::AUTO_EXPOSURE);
   return prop.absValue;
 }
 
@@ -281,7 +342,7 @@ Camera with index 1 has serial id: 15290004
 
   \sa setCameraSerial()
  */
-unsigned int vpFlyCaptureGrabber::getCameraSerial(const unsigned int &index)
+unsigned int vpFlyCaptureGrabber::getCameraSerial(unsigned int index)
 {
   unsigned int num_cameras = vpFlyCaptureGrabber::getNumCameras();
   if(index >= num_cameras) {
@@ -317,7 +378,7 @@ unsigned int vpFlyCaptureGrabber::getCameraSerial(const unsigned int &index)
   \exception vpException::badValue : If the index is greater or equal to the number of
   cameras connected to the bus.
   */
-void vpFlyCaptureGrabber::setCameraIndex(const unsigned int &index)
+void vpFlyCaptureGrabber::setCameraIndex(unsigned int index)
 {
   if(index >= m_numCameras) {
     throw (vpException(vpException::badValue,
@@ -356,7 +417,7 @@ int main()
 
   \sa getCameraSerial()
  */
-void vpFlyCaptureGrabber::setCameraSerial(const unsigned int &serial_id)
+void vpFlyCaptureGrabber::setCameraSerial(unsigned int serial_id)
 {
   FlyCapture2::BusManager busMgr;
   FlyCapture2::Error error;
@@ -375,43 +436,53 @@ void vpFlyCaptureGrabber::setCameraSerial(const unsigned int &serial_id)
 /*!
   Set camera property.
 
-  \param propType : Property type.
+  \param prop_type : Property type.
   \param on : true to turn property on.
-  \param auto_on : true to turn on auto mode, false to turn manual mode.
+  \param auto_on : true to turn auto mode on, false to turn manual mode.
   \param value : value to set.
+  \param prop_value : Switch to affect value to the corresponding variable.
  */
-void vpFlyCaptureGrabber::setProperty(const FlyCapture2::PropertyType &propType,
-                                      const bool &on, const bool &auto_on,
-                                      double value)
+void vpFlyCaptureGrabber::setProperty(const FlyCapture2::PropertyType &prop_type,
+                                      bool on, bool auto_on,
+                                      double value, PropertyValue prop_value)
 {
   this->connect();
 
   FlyCapture2::PropertyInfo propInfo;
-  propInfo = this->getPropertyInfo(propType);
+  propInfo = this->getPropertyInfo(prop_type);
 
   if (propInfo.present) {
     FlyCapture2::Property prop;
-    prop.type = propType;
+    prop.type = prop_type;
     prop.onOff = on && propInfo.onOffSupported;
     prop.autoManualMode = auto_on && propInfo.autoSupported;
     prop.absControl = propInfo.absValSupported;
-    value = std::max<double>(std::min<double>(value, propInfo.absMax),
-                             propInfo.absMin);
-    prop.absValue = value;
+    switch(prop_value) {
+    case ABS_VALUE:
+      value = std::max<double>(std::min<double>(value, propInfo.absMax), propInfo.absMin);
+      prop.absValue = value;
+      break;
+    case VALUE_A:
+      value = std::max<double>(std::min<double>(value, propInfo.max), propInfo.min);
+      prop.valueA = value;
+      break;
+    }
+
     FlyCapture2::Error error;
     error = m_camera.SetProperty(&prop);
     if (error != FlyCapture2::PGRERROR_OK) {
       error.PrintErrorTrace();
       throw (vpException(vpException::fatalError,
                          "Cannot set property %d.",
-                         (int)propType) );
+                         (int)prop_type) );
     }
   }
 }
 
 /*!
   Set camera frame rate.
-  \param frame_rate [in/out] : Camera frame rate (fps).
+  \param frame_rate : Camera frame rate (fps) to set.
+  \return The camera current framerate.
 
   The following example shows how to use this function.
   \code
@@ -428,8 +499,7 @@ int main()
 
   float framerate = g.getFrameRate();
   std::cout << "Cur frame rate: " << std::fixed << std::setprecision(3) << framerate << " fps" << std::endl;
-  framerate = 30;
-  g.setFrameRate(framerate); // Set framerate to 30 fps
+  framerate = g.setFrameRate(30); // Set framerate to 30 fps
   std::cout << "New frame rate: " << std::fixed << std::setprecision(3) << framerate << " fps" << std::endl;
 
   g.open(I);
@@ -441,23 +511,23 @@ int main()
 
   \sa getFramerate()
  */
-void vpFlyCaptureGrabber::setFrameRate(float &frame_rate)
+float vpFlyCaptureGrabber::setFrameRate(float frame_rate)
 {
   this->connect();
 
   this->setProperty(FlyCapture2::FRAME_RATE, true, false, frame_rate);
   FlyCapture2::Property prop = this->getProperty(FlyCapture2::FRAME_RATE);
-  frame_rate = prop.absValue;
+  return prop.absValue;
 }
 
 /*!
   Set camera shutter mode and parameter.
-  \param auto_shutter [in/out]: It true set auto shutter, if false set manual shutter applying \e shutter_ms parameter.
-  \param shutter_ms [in/out]: This is the speed at which the camera shutter opens and closes.
+  \param auto_shutter : If true set auto shutter, if false set manual shutter applying \e shutter_ms parameter.
+  \param shutter_ms : This is the speed at which the camera shutter opens and closes in manual mode.
+  \return The measured shutter after applying the new setting.
 
   The following example shows how to use this function:
   \code
-#include <iomanip>
 #include <visp3/flycapture/vpFlyCaptureGrabber.h>
 
 int main()
@@ -469,14 +539,11 @@ int main()
   g.setCameraIndex(0);
 
   float shutter_ms = g.getShutter();
-  std::cout << "Cur shutter: " << std::fixed << std::setprecision(3) << shutter_ms << " ms" << std::endl;
-  bool shutter_mode = false; // Manual shutter
-  shutter_ms += 10;
-  g.setShutter(shutter_mode, shutter_ms); // Turn manual shutter on
-  std::cout << "Shutter " << ((shutter_mode == true) ? "auto" : "manual") << " value: " << shutter_ms << std::endl;
-  shutter_mode = true; // Auto shutter
-  g.setShutter(shutter_mode, shutter_ms); // Turn auto shutter on
-  std::cout << "Shutter " << ((shutter_mode == true) ? "auto" : "manual") << " value: " << shutter_ms << std::endl;
+  std::cout << "Shutter       : " << shutter_ms << " ms" << std::endl;
+  shutter_ms = g.setShutter(false, 10); // Turn manual shutter on to 10ms
+  std::cout << "Shutter manual: " << shutter_ms << " ms" << std::endl;
+  shutter_ms = g.setShutter(true); // Turn auto shutter on
+  std::cout << "Shutter auto  : " << shutter_ms << " ms" << std::endl;
 
   g.open(I);
   ...
@@ -486,24 +553,24 @@ int main()
 
   \sa getShutter()
  */
-void vpFlyCaptureGrabber::setShutter(bool &auto_shutter, float &shutter_ms)
+float vpFlyCaptureGrabber::setShutter(bool auto_shutter, float shutter_ms)
 {
   this->connect();
 
   this->setProperty(FlyCapture2::SHUTTER, true, auto_shutter, shutter_ms);
   FlyCapture2::Property prop = this->getProperty(FlyCapture2::SHUTTER);
-  auto_shutter = prop.autoManualMode;
-  shutter_ms = prop.absValue;
+  return prop.absValue;
 }
+
 /*!
   Set camera gain mode and value.
-  \param auto_gain [in/out]: It true set auto gain, if false set manual gain applying \e gain_db parameter.
-  \param gain_db [in/out]: The amount of amplification that is applied to a pixel. An increase in gain
+  \param gain_auto : If true set auto gain, if false set manual gain applying \e gain_value parameter.
+  \param gain_value : The amount of amplification that is applied to a pixel in manual mode. An increase in gain
   can result in an increase in noise.
+  \return The measured gain after applying the new setting.
 
-  To turn camera auto gain on, use the following:
+  The following example shows how to use this function:
   \code
-#include <iomanip>
 #include <visp3/flycapture/vpFlyCaptureGrabber.h>
 
 int main()
@@ -515,14 +582,11 @@ int main()
   g.setCameraIndex(0);
 
   float gain_db = g.getGain();
-  std::cout << "Cur gain: " << std::fixed << std::setprecision(3) << gain_db << " db" << std::endl;
-  bool gain_mode = false; // Manual gain
-  gain_db += 5;
-  g.setGain(gain_mode, gain_db); // Turn manual gain on
-  std::cout << "Gain " << ((gain_mode == true) ? "auto" : "manual") << " value: " << gain_db << std::endl;
-  gain_mode = true; // Auto gain
-  g.setGain(gain_mode, gain_db); // Turn auto shutter on
-  std::cout << "Gain " << ((gain_mode == true) ? "auto" : "manual") << " value: " << gain_db << std::endl;
+  std::cout << "Gain: " << gain_db << " db" << std::endl;
+  gain_db = g.setGain(false, 5); // Turn manual gain on to 5db
+  std::cout << "Gain manual: " << gain_db << " db" << std::endl;
+  gain_db = g.setGain(true); // Turn auto shutter on
+  std::cout << "Gain auto  : " << gain_db << " db" << std::endl;
 
   g.open(I);
   ...
@@ -533,21 +597,159 @@ int main()
   \sa getGain()
 
  */
-void vpFlyCaptureGrabber::setGain(bool &auto_gain, float &gain_db)
+float vpFlyCaptureGrabber::setGain(bool gain_auto, float gain_value)
 {
   this->connect();
 
-  this->setProperty(FlyCapture2::SHUTTER, true, auto_gain, gain_db);
+  this->setProperty(FlyCapture2::GAIN, true, gain_auto, gain_value);
   FlyCapture2::Property prop = this->getProperty(FlyCapture2::GAIN);
-  auto_gain = prop.autoManualMode;
-  gain_db = prop.absValue;
+  return prop.absValue;
+}
+
+/*!
+  Set camera brightness mode and parameter.
+  \param brightness_auto : If true set auto brightness, if false set manual brightness applying \e brightness_value parameter.
+  \param brightness_value : This is the level of black in an image. A high brightness will result in a low amount of black in the image.
+  \return The measured brightness after applying the new setting.
+
+  The following example shows how to use this function:
+  \code
+#include <visp3/flycapture/vpFlyCaptureGrabber.h>
+
+int main()
+{
+#if defined(VISP_HAVE_FLYCAPTURE)
+  vpImage<unsigned char> I;
+
+  vpFlyCaptureGrabber g;
+  g.setCameraIndex(0);
+
+  float brightness = g.getBrightness();
+  std::cout << "Brightness       : " << brightness << " %" << std::endl;
+  brightness = g.setBrightness(false, 2); // Turn manual brightness on to 2%
+  std::cout << "Brightness manual: " << brightness << " %" << std::endl;
+  brightness = g.setBrightness(true); // Turn auto brightness on
+  std::cout << "Brightness auto  : " << brightness << " %" << std::endl;
+
+  g.open(I);
+  ...
+#endif
+}
+  \endcode
+
+  \sa getBrightness()
+ */
+float vpFlyCaptureGrabber::setBrightness(bool brightness_auto, float brightness_value)
+{
+  this->connect();
+
+  this->setProperty(FlyCapture2::BRIGHTNESS, true, brightness_auto, brightness_value);
+  FlyCapture2::Property prop = this->getProperty(FlyCapture2::BRIGHTNESS);
+  return prop.absValue;
+}
+
+/*!
+  Set camera exposure mode and parameter.
+
+  \param exposure_on : If true turn exposure on, otherwise turn off.
+  \param exposure_auto : If true set auto exposure, if false set manual exposure applying \e exposure_value parameter.
+  \param exposure_value : This is the average intensity of the image. It will use
+  other available (non-manually adjustable) controls to adjust the image. Specifically,
+  when shutter and gain are both in auto mode, manually adjusting the exposure is
+  actually adjusting the auto-exposure, which tries to make the average intensity of
+  the image 1/4 of the auto-exposure value e.g. exposure is 400, the camera will try
+  to adjust shutter and gain so that the average image intensity is 100. When the
+  auto-exposure mode is enabled for exposure, the camera tries to manipulate shutter
+  and gain such that 5% of the image is saturated (pixel value of 255).
+
+  \return The measured brightness after applying the new setting.
+
+  The following example shows how to use this function:
+  \code
+#include <visp3/flycapture/vpFlyCaptureGrabber.h>
+
+int main()
+{
+#if defined(VISP_HAVE_FLYCAPTURE)
+  vpImage<unsigned char> I;
+
+  vpFlyCaptureGrabber g;
+  g.setCameraIndex(0);
+
+  float exposure = g.getExposure();
+  std::cout << "Exposure       : " << exposure << std::endl;
+  exposure = g.setExposure(true, false, 1); // Turn manual exposure on to 1
+  std::cout << "Exposure manual: " << exposure << std::endl;
+  exposure = g.setExposure(true, true); // Turn auto exposure on
+  std::cout << "Exposure auto  : " << exposure << std::endl;
+
+  g.open(I);
+  ...
+#endif
+}
+  \endcode
+
+  \sa getExposure()
+ */
+float vpFlyCaptureGrabber::setExposure(bool exposure_on, bool exposure_auto, float exposure_value)
+{
+  this->connect();
+
+  this->setProperty(FlyCapture2::AUTO_EXPOSURE, exposure_on, exposure_auto, exposure_value);
+  FlyCapture2::Property prop = this->getProperty(FlyCapture2::AUTO_EXPOSURE);
+  return prop.absValue;
+}
+
+/*!
+  Set camera sharpness mode and parameter.
+
+  \param sharpness_on : If true turn sharpness on, otherwise turn off.
+  \param sharpness_auto : If true set auto sharpness, if false set manual sharpness applying \e sharpness_value parameter.
+  \param sharpness_value : Parameter used to tune the filter applyed on the image to reduce blurred edges in an image.
+
+  \return The measured sharpness after applying the new setting.
+
+  The following example shows how to use this function:
+  \code
+#include <visp3/flycapture/vpFlyCaptureGrabber.h>
+
+int main()
+{
+#if defined(VISP_HAVE_FLYCAPTURE)
+  vpImage<unsigned char> I;
+
+  vpFlyCaptureGrabber g;
+  g.setCameraIndex(0);
+
+  float sharpness = g.getSharpness();
+  std::cout << "Sharpness       : " << sharpness << std::endl;
+  sharpness = g.setSharpness(true, false, 1); // Turn manual sharpness on to 1
+  std::cout << "Sharpness manual: " << sharpness << std::endl;
+  sharpness = g.setSharpness(true, true); // Turn auto sharpness on
+  std::cout << "Sharpness auto  : " << sharpness << std::endl;
+
+  g.open(I);
+  ...
+#endif
+}
+  \endcode
+
+  \sa getSharpness()
+ */
+float vpFlyCaptureGrabber::setSharpness(bool sharpness_on, bool sharpness_auto, float sharpness_value)
+{
+  this->connect();
+
+  this->setProperty(FlyCapture2::SHARPNESS, sharpness_on, sharpness_auto, sharpness_value, VALUE_A);
+  FlyCapture2::Property prop = this->getProperty(FlyCapture2::SHARPNESS);
+  return prop.valueA;
 }
 
 /*!
   Return property values.
   \param prop_type : Property type.
  */
-FlyCapture2::Property vpFlyCaptureGrabber::getProperty(const FlyCapture2::PropertyType &prop_type)
+FlyCapture2::Property vpFlyCaptureGrabber::getProperty(FlyCapture2::PropertyType prop_type)
 {
   this->connect();
 
@@ -569,7 +771,7 @@ FlyCapture2::Property vpFlyCaptureGrabber::getProperty(const FlyCapture2::Proper
   \exception vpException::fatalError : If property type doesn't exist.
  */
 FlyCapture2::PropertyInfo
-vpFlyCaptureGrabber::getPropertyInfo(const FlyCapture2::PropertyType &prop_type)
+vpFlyCaptureGrabber::getPropertyInfo(FlyCapture2::PropertyType prop_type)
 {
   this->connect();
 
@@ -616,8 +818,8 @@ int main()
 }
   \endcode
  */
-void vpFlyCaptureGrabber::setVideoModeAndFrameRate(const FlyCapture2::VideoMode &video_mode,
-                                                   const FlyCapture2::FrameRate &frame_rate)
+void vpFlyCaptureGrabber::setVideoModeAndFrameRate(FlyCapture2::VideoMode video_mode,
+                                                   FlyCapture2::FrameRate frame_rate)
 {
   this->connect();
 
@@ -630,8 +832,26 @@ void vpFlyCaptureGrabber::setVideoModeAndFrameRate(const FlyCapture2::VideoMode 
 }
 
 /*!
+  Return true if video mode and framerate is supported.
+  */
+bool vpFlyCaptureGrabber::isVideoModeAndFrameRateSupported(FlyCapture2::VideoMode video_mode,
+                                                           FlyCapture2::FrameRate frame_rate)
+{
+  this->connect();
+
+  FlyCapture2::Error error;
+  bool supported = false;
+  error = m_camera.GetVideoModeAndFrameRateInfo(video_mode, frame_rate, &supported);
+  if (error != FlyCapture2::PGRERROR_OK) {
+    error.PrintErrorTrace();
+    throw (vpException(vpException::fatalError, "Cannot get video mode and framerate.") );
+  }
+  return supported;
+}
+
+/*!
   Return size and offset corresponding to a centered roi.
-  \param size : Horizontal or vertical roi size.
+  \param size : Horizontal or vertical roi size. If set to 0, use the max allowed size.
   \param max_size : Allowed max size.
   \param step : Step.
  */
@@ -650,7 +870,7 @@ vpFlyCaptureGrabber::centerRoi(int size, int max_size, int step)
   Set format7 video mode.
   \param format7_mode : Format 7 mode.
   \param pixel_format : Pixel format.
-  \param width,height : Size of the centered roi.
+  \param width,height : Size of the centered roi. If set to 0, use the max allowed size.
 
   If the format7 video mode and pixel format are not supported, return an exception.
 
@@ -690,10 +910,10 @@ void vpFlyCaptureGrabber::setFormat7VideoMode(FlyCapture2::Mode format7_mode,
   error = m_camera.GetFormat7Info(&fmt7_info, &fmt7_supported);
   if (error != FlyCapture2::PGRERROR_OK) {
     error.PrintErrorTrace();
-    throw (vpException(vpException::fatalError, "Cannot get format 7 info.") );
+    throw (vpException(vpException::fatalError, "Cannot get format7 info.") );
   }
   if (! fmt7_supported) {
-    throw (vpException(vpException::fatalError, "Format 7 mode %d not supported.", (int)format7_mode) );
+    throw (vpException(vpException::fatalError, "Format7 mode %d not supported.", (int)format7_mode) );
   }
 
   FlyCapture2::Format7ImageSettings fmt7_settings;
@@ -713,10 +933,10 @@ void vpFlyCaptureGrabber::setFormat7VideoMode(FlyCapture2::Mode format7_mode,
   error = m_camera.ValidateFormat7Settings(&fmt7_settings, &valid, &fmt7_packet_info);
   if (error != FlyCapture2::PGRERROR_OK) {
     error.PrintErrorTrace();
-    throw (vpException(vpException::fatalError, "Cannot validate format 7 settings.") );
+    throw (vpException(vpException::fatalError, "Cannot validate format7 settings.") );
   }
   if (! valid) {
-    throw (vpException(vpException::fatalError, "Format 7 settings are not valid.") );
+    throw (vpException(vpException::fatalError, "Format7 settings are not valid.") );
   }
   error = m_camera.SetFormat7Configuration(&fmt7_settings, fmt7_packet_info.recommendedBytesPerPacket);
   if (error != FlyCapture2::PGRERROR_OK) {
@@ -725,6 +945,26 @@ void vpFlyCaptureGrabber::setFormat7VideoMode(FlyCapture2::Mode format7_mode,
   }
 }
 
+/*!
+  Return true if format7 mode is supported.
+  */
+bool vpFlyCaptureGrabber::isFormat7Supported(FlyCapture2::Mode format7_mode)
+{
+  this->connect();
+
+  FlyCapture2::Format7Info fmt7_info;
+  bool supported = false;
+  FlyCapture2::Error error;
+
+  fmt7_info.mode = format7_mode;
+  error = m_camera.GetFormat7Info(&fmt7_info, &supported);
+  if (error != FlyCapture2::PGRERROR_OK) {
+    error.PrintErrorTrace();
+    throw (vpException(vpException::fatalError, "Cannot get format7 info.") );
+  }
+
+  return supported;
+}
 /*!
    Start active camera capturing images.
 
@@ -1065,7 +1305,7 @@ int main()
 
   \sa getCameraPower()
  */
-void vpFlyCaptureGrabber::setCameraPower(const bool &on)
+void vpFlyCaptureGrabber::setCameraPower(bool on)
 {
   this->connect();
 

@@ -62,15 +62,17 @@ int main()
     vpImage<unsigned char> I;
 
     g.setCameraIndex(0);
-    std::cout << "Framerate: " << g.getFrameRate() << " fps" << std::endl;
-    std::cout << "Shutter  : " << g.getShutter() << " ms" << std::endl;
-    std::cout << "Gain     : " << g.getGain() << " db" << std::endl;
-
-    g.setFormat7VideoMode(FlyCapture2::MODE_0, FlyCapture2::PIXEL_FORMAT_MONO8, 640, 480);
-    g.open(I);
     g.getCameraInfo(std::cout);
 
-    std::cout << "Frame rate is " << std::fixed << std::setprecision(3) << g.getFrameRate() << " fps" << std::endl;
+    std::cout << "Camera settings: " << std::endl;
+    std::cout << " Framerate : " << g.getFrameRate() << " fps" << std::endl;
+    std::cout << " Shutter   : " << g.getShutter() << " ms" << std::endl;
+    std::cout << " Gain      : " << g.getGain() << " db" << std::endl;
+    std::cout << " Brightness: " << g.getBrightness() << " %" << std::endl;
+    std::cout << " Exposure  : " << g.getExposure() << std::endl;
+    std::cout << " Sharpness : " << g.getSharpness() << std::endl;
+
+    g.open(I);
 
 #if defined(VISP_HAVE_X11)
     vpDisplayX d(I);
