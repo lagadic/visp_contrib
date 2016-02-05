@@ -162,7 +162,9 @@ public:
   static unsigned int getCameraSerial(const unsigned int &index);
 
   float getFrameRate();
+  float getGain();
   static unsigned int getNumCameras();
+  float getShutter();
 
   //! Return true if the camera is connected.
   bool isConnected() const {
@@ -179,6 +181,9 @@ public:
   void setCameraPower(const bool &on);
   void setCameraSerial(const unsigned int &serial);
   void setGain(bool &auto_gain, float &gain_db);
+  void setFormat7VideoMode(FlyCapture2::Mode format7_mode,
+                           FlyCapture2::PixelFormat pixel_format,
+                           int width, int height);
   void setFrameRate(float &frame_rate);
   void setProperty(const FlyCapture2::PropertyType &prop_type,
                    const bool &on, const bool &auto_on, double value);
@@ -190,6 +195,7 @@ public:
   void stopCapture();
 
 protected:
+  std::pair<int, int> centerRoi(int size, int max_size, int step);
   FlyCapture2::Property getProperty(const FlyCapture2::PropertyType &prop_type);
   FlyCapture2::PropertyInfo getPropertyInfo(const FlyCapture2::PropertyType &prop_type);
   bool isCameraPowerAvailable();
