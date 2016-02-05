@@ -168,7 +168,7 @@ public:
   float getFrameRate();
   float getGain();
   static unsigned int getNumCameras();
-  float getSharpness();
+  unsigned int getSharpness();
   float getShutter();
 
   bool isCameraPowerAvailable();
@@ -195,7 +195,7 @@ public:
                            FlyCapture2::PixelFormat pixel_format,
                            int width, int height);
   float setFrameRate(float frame_rate);
-  float setSharpness(bool sharpness_on, bool sharpness_auto, float sharpness_value=0);
+  unsigned int setSharpness(bool sharpness_on, bool sharpness_auto, unsigned int sharpness_value=0);
   float setShutter(bool auto_shutter, float shutter_ms=10);
   void setVideoModeAndFrameRate(FlyCapture2::VideoMode video_mode,
                                 FlyCapture2::FrameRate frame_rate);
@@ -213,7 +213,7 @@ protected:
   FlyCapture2::PropertyInfo getPropertyInfo(FlyCapture2::PropertyType prop_type);
   void open();
   void setProperty(const FlyCapture2::PropertyType &prop_type,
-                   bool on, bool auto_on, double value,
+                   bool on, bool auto_on, float value,
                    PropertyValue prop_value=ABS_VALUE);
 
 protected:

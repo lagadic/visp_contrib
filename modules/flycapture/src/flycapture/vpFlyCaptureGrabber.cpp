@@ -284,7 +284,7 @@ float vpFlyCaptureGrabber::getBrightness()
 
   \sa setSharpness()
  */
-float vpFlyCaptureGrabber::getSharpness()
+unsigned int vpFlyCaptureGrabber::getSharpness()
 {
   this->connect();
 
@@ -444,7 +444,7 @@ void vpFlyCaptureGrabber::setCameraSerial(unsigned int serial_id)
  */
 void vpFlyCaptureGrabber::setProperty(const FlyCapture2::PropertyType &prop_type,
                                       bool on, bool auto_on,
-                                      double value, PropertyValue prop_value)
+                                      float value, PropertyValue prop_value)
 {
   this->connect();
 
@@ -458,14 +458,16 @@ void vpFlyCaptureGrabber::setProperty(const FlyCapture2::PropertyType &prop_type
     prop.autoManualMode = auto_on && propInfo.autoSupported;
     prop.absControl = propInfo.absValSupported;
     switch(prop_value) {
-    case ABS_VALUE:
-      value = std::max<double>(std::min<double>(value, propInfo.absMax), propInfo.absMin);
-      prop.absValue = value;
+    case ABS_VALUE: {
+      float value_ = std::max<float>(std::min<float>(value, propInfo.absMax), propInfo.absMin);
+      prop.absValue = value_;
       break;
-    case VALUE_A:
-      value = std::max<double>(std::min<double>(value, propInfo.max), propInfo.min);
-      prop.valueA = value;
+    }
+    case VALUE_A: {
+      unsigned int value_ = std::max<unsigned int>(std::min<unsigned int>((unsigned int)value, propInfo.max), propInfo.min);
+      prop.valueA = value_;
       break;
+    }
     }
 
     FlyCapture2::Error error;
@@ -723,7 +725,7 @@ int main()
 
   float sharpness = g.getSharpness();
   std::cout << "Sharpness       : " << sharpness << std::endl;
-  sharpness = g.setSharpness(true, false, 1); // Turn manual sharpness on to 1
+  sharpness = g.setSharpness(true, false, 1000); // Turn manual sharpness on to 1000
   std::cout << "Sharpness manual: " << sharpness << std::endl;
   sharpness = g.setSharpness(true, true); // Turn auto sharpness on
   std::cout << "Sharpness auto  : " << sharpness << std::endl;
@@ -736,11 +738,11 @@ int main()
 
   \sa getSharpness()
  */
-float vpFlyCaptureGrabber::setSharpness(bool sharpness_on, bool sharpness_auto, float sharpness_value)
+unsigned int vpFlyCaptureGrabber::setSharpness(bool sharpness_on, bool sharpness_auto, unsigned int sharpness_value)
 {
   this->connect();
 
-  this->setProperty(FlyCapture2::SHARPNESS, sharpness_on, sharpness_auto, sharpness_value, VALUE_A);
+  this->setProperty(FlyCapture2::SHARPNESS, sharpness_on, sharpness_auto, (float)sharpness_value, VALUE_A);
   FlyCapture2::Property prop = this->getProperty(FlyCapture2::SHARPNESS);
   return prop.valueA;
 }
