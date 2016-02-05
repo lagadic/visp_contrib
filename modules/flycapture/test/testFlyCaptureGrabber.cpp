@@ -49,10 +49,27 @@
 #include <visp3/gui/vpDisplayOpenCV.h>
 #include <visp3/flycapture/vpFlyCaptureGrabber.h>
 
-int main()
+int main(int argc, const char ** argv)
 {
 #if defined(VISP_HAVE_FLYCAPTURE)
   try {
+    bool opt_display_on = true;
+    bool opt_click_on = true;
+    for (int i=0; i<argc; i++) {
+      if (std::string(argv[i]) == "-d")
+        opt_display_on = false;
+      if (std::string(argv[i]) == "-c")
+        opt_click_on = false;
+      else if (std::string(argv[i]) == "-h") {
+        std::cout << "\nUsage: " << argv[0] << " [-d] [-c] [-h]\n" << std::endl;
+        std::cout << "Options: " << std::endl;
+        std::cout << " -d : Turn display off" << std::endl;
+        std::cout << " -c : Turn click off" << std::endl;
+        std::cout << " -h : Print help message\n" << std::endl;
+        return 0;
+      }
+    }
+
     unsigned int numCameras = vpFlyCaptureGrabber::getNumCameras();
     std::cout << "Number of cameras detected: " << numCameras << std::endl;
     if (numCameras == 0)
@@ -74,15 +91,18 @@ int main()
 
     g.open(I);
 
+    vpDisplay *display = NULL;
+    if (opt_display_on) {
 #if defined(VISP_HAVE_X11)
-    vpDisplayX d(I);
+      display = new vpDisplayX(I);
 #elif defined(VISP_HAVE_GDI)
-    vpDisplayGDI d(I);
+      display = new vpDisplayGDI(I);
 #elif defined(VISP_HAVE_OPENCV)
-    vpDisplayOpenCV d(I);
+      display = new vpDisplayOpenCV(I);
 #else
-    std::cout << "No image viewer is available..." << std::endl;
+      std::cout << "No image viewer is available..." << std::endl;
 #endif
+    }
 
     bool ret = false;
     while(!ret) {
@@ -90,13 +110,24 @@ int main()
       vpDisplay::display(I);
       vpDisplay::displayText(I, 10, 10, "Click to quit...", vpColor::red);
       vpDisplay::flush(I);
-      ret = vpDisplay::getClick(I, false);
+      if (opt_click_on && opt_display_on)
+        ret = vpDisplay::getClick(I, false);
+      else {
+        static unsigned int cpt = 0;
+        if (cpt ++ == 10)
+          break;
+      }
+
     }
+    if (display != NULL)
+      delete display;
   }
   catch(vpException &e) {
     std::cout << "Catch an exception: " << e.getStringMessage() << std::endl;
   }
 #else
+  (void)argc;
+  (void)argv;
   std::cout << "You should install PointGrey FlyCapture SDK to use this binary..." << std::endl;
 #endif
 }
