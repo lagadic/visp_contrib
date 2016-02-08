@@ -38,7 +38,7 @@
 #include <visp3/core/vpConfig.h>
 
 /*!
-  \example grabOpenCV-2.cpp
+  \example grabFlyCapture.cpp
 
   \brief Example of framegrabbing using OpenCV cv::VideoCapture class.
 
