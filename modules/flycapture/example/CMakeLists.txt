@@ -28,38 +28,21 @@
 # WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 #
 # Description:
-# ViSP configuration file.
+# ViSP configuration file. 
 #
 # Authors:
 # Fabien Spindler
 #
 #############################################################################
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+project(example-device-flycapture)
 
-# Looking for module dependencies 
-if(NOT FLYCAPTURE_FOUND)
-  VP_OPTION(USE_FLYCAPTURE FlyCapture "" "Include FlyCapture SDK support for PointGrey cameras" "" ON)
-endif()
+cmake_minimum_required(VERSION 2.6)
 
-VP_SET(VISP_HAVE_FLYCAPTURE        TRUE IF (BUILD_MODULE_visp_flycapture AND USE_FLYCAPTURE))
+find_package(VISP REQUIRED visp_flycapture visp_io visp_gui)
 
-# Add optional 3rd parties
-set(opt_incs "")
-set(opt_libs "")
+include_directories(${VISP_INCLUDE_DIRS})
+add_executable(grabFlyCapture grabFlyCapture.cpp)
+target_link_libraries(grabFlyCapture ${VISP_LIBRARIES})
 
-# camera devices: Point Grey FlyCapture SDK
-if(USE_FLYCAPTURE)
-  list(APPEND opt_incs ${FLYCAPTURE_INCLUDE_DIRS})
-  list(APPEND opt_libs ${FLYCAPTURE_LIBRARIES})
-endif()
-
-vp_add_module(flycapture visp_core)
-vp_glob_module_sources()
-vp_module_include_directories(${opt_incs})
-vp_create_module(${opt_libs})
-
-vp_add_config_file("cmake/template/vpConfigFlycapture.h.in")
-vp_add_tests(DEPENDS_ON visp_gui)
-
-add_subdirectory(example)
+add_test(grabFlyCapture grabFlyCapture ${OPTION_TO_DESACTIVE_DISPLAY})
