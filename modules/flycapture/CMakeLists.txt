@@ -62,4 +62,3 @@ vp_create_module(${opt_libs})
 vp_add_config_file("cmake/template/vpConfigFlycapture.h.in")
 vp_add_tests(DEPENDS_ON visp_gui)
 
-add_subdirectory(example)
