@@ -55,6 +55,13 @@ namespace vp
       RETINEX_UNIFORM = 0, RETINEX_LOW = 1, RETINEX_HIGH = 2
   };
 
+  typedef enum {
+    CONNECTED_CONNEXITY_4, /*!< For a given pixel 4 neighbors are considered (left,
+                      right, up, down) */
+    CONNECTED_CONNEXITY_8 /*!< For a given pixel 8 neighbors are considered (left,
+                     right, up, down, and the 4 pixels located on the diagonal) */
+  } vpConnectedConnexityType;
+
   VISP_EXPORT void adjust(vpImage<unsigned char> &I, const double alpha, const double beta);
   VISP_EXPORT void adjust(const vpImage<unsigned char> &I1, vpImage<unsigned char> &I2, const double alpha, const double beta);
   VISP_EXPORT void adjust(vpImage<vpRGBa> &I, const double alpha, const double beta);
@@ -89,6 +96,9 @@ namespace vp
   VISP_EXPORT void unsharpMask(vpImage<vpRGBa> &I, const unsigned int size=7, const double weight=0.6);
   VISP_EXPORT void unsharpMask(const vpImage<vpRGBa> &I, vpImage<vpRGBa> &Ires,
       const unsigned int size=7, const double weight=0.6);
+
+  VISP_EXPORT void connectedComponents(const vpImage<unsigned char> &I, vpImage<int> &labels, int &nbComponents,
+                                       const vpConnectedConnexityType &connexity=CONNECTED_CONNEXITY_4);
 }
 
 #endif

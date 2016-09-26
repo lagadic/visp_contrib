@@ -35,3 +35,8 @@
   \defgroup group_imgproc_retinex Retinex
   Retinex.
 */
+/*!
+  \ingroup module_imgproc
+  \defgroup group_imgproc_connected_components Connected components
+  Connected components.
+*/
