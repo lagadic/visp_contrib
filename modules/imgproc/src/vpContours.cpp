@@ -236,6 +236,7 @@ void getContoursList(const vp::vpContour &root, const int level, vp::vpContour &
 
   \param I : Grayscale image where we want to draw the input contours.
   \param contours : Detected contours.
+  \param grayValue : Drawing grayscale color.
 */
 void vp::drawContours(vpImage<unsigned char> &I, const std::vector<std::vector<vpImagePoint> > &contours, unsigned char grayValue) {
   if (I.getSize() == 0) {
@@ -279,7 +280,7 @@ void vp::drawContours(vpImage<vpRGBa> &I, const std::vector<std::vector<vpImageP
 
   Extract contours from a binary image.
 
-  \param I_original : Input image (0 means background, 1 means foreground, other values are not allowed).
+  \param I_original : Input binary image (0 means background, 1 means foreground, other values are not allowed).
   \param contours : Detected contours.
   \param contourPts : List of contours, each contour contains a list of contour points.
   \param retrievalMode : Contour retrieval mode.
@@ -432,4 +433,3 @@ void vp::findContours(const vpImage<unsigned char> &I_original, vpContour &conto
   delete root;
   root = NULL;
 }
-

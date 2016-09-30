@@ -1,7 +1,7 @@
 /****************************************************************************
  *
  * This file is part of the ViSP software.
- * Copyright (C) 2005 - 2015 by Inria. All rights reserved.
+ * Copyright (C) 2005 - 2016 by Inria. All rights reserved.
  *
  * This software is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -36,7 +36,6 @@
  *****************************************************************************/
 
 
-
 /*!
   \file vpImgproc.h
   \brief Basic image processing functions.
@@ -47,6 +46,7 @@
 #define __vpImgproc_h__
 
 #include <visp3/core/vpImage.h>
+#include <visp3/core/vpImageMorphology.h>
 #include <visp3/imgproc/vpContours.h>
 
 
@@ -55,13 +55,6 @@ namespace vp
   enum RETINEX_LEVEL {
       RETINEX_UNIFORM = 0, RETINEX_LOW = 1, RETINEX_HIGH = 2
   };
-
-  typedef enum {
-    CONNECTED_CONNEXITY_4, /*!< For a given pixel 4 neighbors are considered (left,
-                      right, up, down) */
-    CONNECTED_CONNEXITY_8 /*!< For a given pixel 8 neighbors are considered (left,
-                     right, up, down, and the 4 pixels located on the diagonal) */
-  } vpConnectedConnexityType;
 
   VISP_EXPORT void adjust(vpImage<unsigned char> &I, const double alpha, const double beta);
   VISP_EXPORT void adjust(const vpImage<unsigned char> &I1, vpImage<unsigned char> &I2, const double alpha, const double beta);
@@ -99,7 +92,12 @@ namespace vp
       const unsigned int size=7, const double weight=0.6);
 
   VISP_EXPORT void connectedComponents(const vpImage<unsigned char> &I, vpImage<int> &labels, int &nbComponents,
-                                       const vpConnectedConnexityType &connexity=vp::CONNECTED_CONNEXITY_4);
+                                       const vpImageMorphology::vpConnexityType &connexity=vpImageMorphology::CONNEXITY_4);
+
+  VISP_EXPORT void fillHoles(vpImage<unsigned char> &I, const vpImageMorphology::vpConnexityType &connexity=vpImageMorphology::CONNEXITY_4);
+
+  VISP_EXPORT void reconstruct(const vpImage<unsigned char> &marker, const vpImage<unsigned char> &mask, vpImage<unsigned char> &I,
+                               const vpImageMorphology::vpConnexityType &connexity=vpImageMorphology::CONNEXITY_4);
 }
 
 #endif
