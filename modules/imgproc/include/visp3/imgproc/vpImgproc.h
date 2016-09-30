@@ -47,6 +47,7 @@
 #define __vpImgproc_h__
 
 #include <visp3/core/vpImage.h>
+#include <visp3/imgproc/vpContours.h>
 
 
 namespace vp
@@ -98,7 +99,7 @@ namespace vp
       const unsigned int size=7, const double weight=0.6);
 
   VISP_EXPORT void connectedComponents(const vpImage<unsigned char> &I, vpImage<int> &labels, int &nbComponents,
-                                       const vpConnectedConnexityType &connexity=CONNECTED_CONNEXITY_4);
+                                       const vpConnectedConnexityType &connexity=vp::CONNECTED_CONNEXITY_4);
 }
 
 #endif
