@@ -1,7 +1,7 @@
 /****************************************************************************
  *
  * This file is part of the ViSP software.
- * Copyright (C) 2005 - 2015 by Inria. All rights reserved.
+ * Copyright (C) 2005 - 2016 by Inria. All rights reserved.
  *
  * This software is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -46,10 +46,10 @@
 
 void getNeighbors(const vpImage<unsigned char> &I, std::queue<vpImagePoint> &listOfNeighbors,
                   const unsigned int i, const unsigned int j,
-                  const vp::vpConnectedConnexityType &connexity) {
+                  const vpImageMorphology::vpConnexityType &connexity) {
   unsigned char currValue = I[i][j];
 
-  if (connexity == vp::CONNECTED_CONNEXITY_4) {
+  if (connexity == vpImageMorphology::CONNEXITY_4) {
     //Top
     if (I[i-1][j] == currValue) {
       listOfNeighbors.push(vpImagePoint(i-1, j));
@@ -84,7 +84,7 @@ void getNeighbors(const vpImage<unsigned char> &I, std::queue<vpImagePoint> &lis
 }
 
 void visitNeighbors(vpImage<unsigned char> &I_copy, std::queue<vpImagePoint> &listOfNeighbors, vpImage<int> &labels,
-                    const int current_label, const vp::vpConnectedConnexityType &connexity) {
+                    const int current_label, const vpImageMorphology::vpConnexityType &connexity) {
   //Visit the neighbors
   while (!listOfNeighbors.empty()) {
     vpImagePoint imPt = listOfNeighbors.front();
@@ -112,8 +112,8 @@ void visitNeighbors(vpImage<unsigned char> &I_copy, std::queue<vpImagePoint> &li
   \param nbComponents : Number of connected components.
   \param connexity : Type of connexity.
 */
-void vp::connectedComponents(const vpImage<unsigned char> &I, vpImage<int> &labels,
-                             int &nbComponents, const vpConnectedConnexityType &connexity) {
+void vp::connectedComponents(const vpImage<unsigned char> &I, vpImage<int> &labels, int &nbComponents,
+                             const vpImageMorphology::vpConnexityType &connexity) {
   if (I.getSize() == 0) {
     return;
   }
