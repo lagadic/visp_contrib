@@ -380,15 +380,12 @@ main(int argc, const char ** argv)
 
     //Test fillHoles
     vpImage<unsigned char> I_holes = I_draw_contours_external;
-    vpImageTools::binarise(I_holes, (unsigned char) 127, (unsigned char) 255, (unsigned char) 0, (unsigned char) 1, (unsigned char) 1);
+    vpImageTools::binarise(I_holes, (unsigned char) 127, (unsigned char) 255, (unsigned char) 0, (unsigned char) 255, (unsigned char) 255);
 
     t = vpTime::measureTimeMs();
     vp::fillHoles(I_holes);
     t = vpTime::measureTimeMs() - t;
     std::cout << "\nFill Holes: " << t << " ms" << std::endl;
-    for (unsigned int cpt = 0; cpt < I_holes.getSize(); cpt++) {
-      I_holes.bitmap[cpt] *= 255;
-    }
 
     filename = vpIoTools::createFilePath(opath, "Klimt_contours_extracted_external_fill_holes.pgm");
     vpImageIo::write(I_holes, filename);

@@ -41,6 +41,7 @@
 */
 
 #include <visp3/imgproc/vpImgproc.h>
+#include <visp3/core/vpImageTools.h>
 
 
 /*!
@@ -48,14 +49,28 @@
 
   Fill the holes in a binary image.
 
-  \param I : Input binary image (0 means background, 1 means foreground, other values are not allowed).
-  \param connexity : Type of connexity.
+  \param I : Input binary image (0 means background).
+  \param fillValue : Value to used to fill the holes (foreground value).
 */
-void vp::fillHoles(vpImage<unsigned char> &I, const vpImageMorphology::vpConnexityType &connexity) {
+void vp::fillHoles(vpImage<unsigned char> &I
+#if USE_OLD_FILL_HOLE
+                   , const vpImageMorphology::vpConnexityType &connexity
+#else
+                   , const unsigned char fillValue
+#endif
+                   ) {
   if (I.getSize() == 0) {
     return;
   }
 
+#if USE_OLD_FILL_HOLE
+  //Code similar to Matlab imfill(BW,'holes')
+  //Replaced by flood fill as imfill use imreconstruct
+  //and our reconstruct implementation is naive and inefficient
+  //Difference between new and old implementation:
+  //  - new implementation allows to set the fill value
+  //  - only background==0 is required, before it was 0 (background) / 1 (foreground)
+  //  - no more connexity option
   vpImage<unsigned char> mask(I.getHeight() + 2, I.getWidth() + 2, 255);
   //Copy I to mask + add border padding + complement
   for (unsigned int i = 0; i < I.getHeight(); i++) {
@@ -85,6 +100,35 @@ void vp::fillHoles(vpImage<unsigned char> &I, const vpImageMorphology::vpConnexi
       I[i][j] = 255 - I_reconstruct[i+1][j+1];
     }
   }
+#else
+  //Create flood fill mask
+  vpImage<unsigned char> flood_fill_mask(I.getHeight() + 2, I.getWidth() + 2, 0);
+  //Copy I to mask + add border padding
+  for (unsigned int i = 0; i < I.getHeight(); i++) {
+    if (i == 0 || i == flood_fill_mask.getHeight() - 1) {
+      for (unsigned int j = 0; j < flood_fill_mask.getWidth(); j++) {
+        flood_fill_mask[i][j] = 0;
+      }
+    } else {
+      flood_fill_mask[i][0] = 0;
+      memcpy(flood_fill_mask[i]+1, I[i-1], sizeof(unsigned char)*I.getWidth());
+      flood_fill_mask[i][flood_fill_mask.getWidth() - 1] = 0;
+    }
+  }
+
+  //Perform flood fill
+  vp::floodFill(flood_fill_mask, vpImagePoint(0,0), 0, fillValue);
+
+  //Get current mask
+  vpImage<unsigned char> mask(I.getHeight(), I.getWidth());
+  for (unsigned int i = 0; i < mask.getHeight(); i++) {
+    memcpy(mask[i], flood_fill_mask[i+1]+1, sizeof(unsigned char)*mask.getWidth());
+  }
+
+  //Get image with holes filled
+  vpImage<unsigned char> I_white(I.getHeight(), I.getWidth(), fillValue);
+  vpImageTools::imageSubtract(I_white, mask, I);
+#endif
 }
 
 /*!
@@ -105,7 +149,7 @@ void vp::fillHoles(vpImage<unsigned char> &I, const vpImageMorphology::vpConnexi
   \param connexity : Type of connexity.
 */
 void vp::reconstruct(const vpImage<unsigned char> &marker, const vpImage<unsigned char> &mask, vpImage<unsigned char> &h_kp1 /*alias I */,
-                const vpImageMorphology::vpConnexityType &connexity) {
+                     const vpImageMorphology::vpConnexityType &connexity) {
   if (marker.getHeight() != mask.getHeight() || marker.getWidth() != mask.getWidth()) {
     std::cerr << "marker.getHeight() != mask.getHeight() || marker.getWidth() != mask.getWidth()" << std::endl;
     return;

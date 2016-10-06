@@ -49,6 +49,8 @@
 #include <visp3/core/vpImageMorphology.h>
 #include <visp3/imgproc/vpContours.h>
 
+#define USE_OLD_FILL_HOLE 0
+
 
 namespace vp
 {
@@ -94,7 +96,16 @@ namespace vp
   VISP_EXPORT void connectedComponents(const vpImage<unsigned char> &I, vpImage<int> &labels, int &nbComponents,
                                        const vpImageMorphology::vpConnexityType &connexity=vpImageMorphology::CONNEXITY_4);
 
-  VISP_EXPORT void fillHoles(vpImage<unsigned char> &I, const vpImageMorphology::vpConnexityType &connexity=vpImageMorphology::CONNEXITY_4);
+  VISP_EXPORT void fillHoles(vpImage<unsigned char> &I
+#if USE_OLD_FILL_HOLE
+                             , const vpImageMorphology::vpConnexityType &connexity=vpImageMorphology::CONNEXITY_4
+#else
+                             , const unsigned char fillValue=255
+#endif
+      );
+
+  VISP_EXPORT void floodFill(vpImage<unsigned char> &I, const vpImagePoint &seedPoint, const unsigned char oldValue, const unsigned char newValue,
+                             const vpImageMorphology::vpConnexityType &connexity=vpImageMorphology::CONNEXITY_4);
 
   VISP_EXPORT void reconstruct(const vpImage<unsigned char> &marker, const vpImage<unsigned char> &mask, vpImage<unsigned char> &I,
                                const vpImageMorphology::vpConnexityType &connexity=vpImageMorphology::CONNEXITY_4);
