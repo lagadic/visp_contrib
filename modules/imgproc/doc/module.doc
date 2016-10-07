@@ -50,3 +50,11 @@
   \defgroup group_imgproc_morph Additional image morphology functions
   Additional image morphology functions.
 */
+/*!
+  \ingroup module_imgproc
+  \defgroup group_imgproc_threshold Automatic thresholding
+  Automatic thresholding using various well-known methods.
+  
+  \image html img-auto-threshold-grid36-03.png Input image.
+  \image html img-auto-threshold-grid36-03-otsu.png Image automatically thresholded with the Otsu method.
+*/
