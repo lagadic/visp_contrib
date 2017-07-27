@@ -34,7 +34,8 @@
  * Souriya Trinh
  *
  *****************************************************************************/
-
+#include <map>
+#include <set>
 #include <visp3/core/vpIoTools.h>
 #include <visp3/core/vpImageTools.h>
 #include <visp3/io/vpImageIo.h>
@@ -53,6 +54,7 @@
 
 void usage(const char *name, const char *badparam, std::string ipath, std::string opath, std::string user);
 bool getOptions(int argc, const char **argv, std::string &ipath, std::string &opath, std::string user);
+bool checkLabels(const vpImage<int> &label1, const vpImage<int> &label2);
 
 /*
   Print the program options.
@@ -116,8 +118,8 @@ bool getOptions(int argc, const char **argv, std::string &ipath, std::string &op
 
     switch (c) {
     case 'i': ipath = optarg_; break;
-      case 'o': opath = optarg_; break;
-      case 'h': usage(argv[0], NULL, ipath, opath, user); return false; break;
+    case 'o': opath = optarg_; break;
+    case 'h': usage(argv[0], NULL, ipath, opath, user); return false; break;
 
     case 'c':
     case 'd':
@@ -134,6 +136,50 @@ bool getOptions(int argc, const char **argv, std::string &ipath, std::string &op
     std::cerr << "ERROR: " << std::endl;
     std::cerr << "  Bad argument " << optarg_ << std::endl << std::endl;
     return false;
+  }
+
+  return true;
+}
+
+bool checkLabels(const vpImage<int> &label1, const vpImage<int> &label2) {
+  if (label1.getHeight() != label2.getHeight() || label1.getWidth() != label2.getWidth())
+    return false;
+
+  std::map<int, std::vector<vpImagePoint> > map_label1, map_label2;
+  for (unsigned int i = 0; i < label1.getHeight(); i++) {
+    for (unsigned int j = 0; j < label1.getWidth(); j++) {
+      if ((label1[i][j] > 0 && label2[i][j] == 0) || (label1[i][j] == 0 && label2[i][j] > 0)) {
+        std::cerr << "label1[i][j] > 0 && label2[i][j] == 0 || label1[i][j] == 0 && label2[i][j] > 0" << std::endl;
+        return false;
+      }
+
+      if (label1[i][j])
+        map_label1[label1[i][j]].push_back(vpImagePoint(i,j));
+
+      if (label2[i][j])
+        map_label2[label2[i][j]].push_back(vpImagePoint(i,j));
+    }
+  }
+
+  if (map_label1.size() != map_label2.size()) {
+    std::cerr << "map_label1.size() != map_label2.size()" << std::endl;
+    return false;
+  }
+
+  for (std::map<int, std::vector<vpImagePoint> >::const_iterator it1 = map_label1.begin(); it1 != map_label1.end(); ++it1) {
+    //Get corresponding label in the other method
+    unsigned int i = (unsigned int) it1->second.front().get_i(), j = (unsigned int) it1->second.front().get_j();
+    int lab2 = label2[i][j];
+
+    std::vector<vpImagePoint>::const_iterator it_pt1 = it1->second.begin();
+    for (; it_pt1 != it1->second.end(); ++it_pt1) {
+      i = (unsigned int) it_pt1->get_i();
+      j = (unsigned int) it_pt1->get_j();
+      if (label2[i][j] != lab2) {
+        std::cerr << "label2[i][j] != lab2" << std::endl;
+        return false;
+      }
+    }
   }
 
   return true;
@@ -292,17 +338,24 @@ main(int argc, const char ** argv)
     cv::connectedComponents(matImg, matLabels_4, 4);
     t_opencv = vpTime::measureTimeMs() - t_opencv;
 
+    std::set<int> set_labels_connex4_opencv;
     vpImage<int> labels_connex4_opencv((unsigned int) matLabels_4.rows, (unsigned int) matLabels_4.cols);
     for (int i = 0; i < matLabels_4.rows; i++) {
       for (int j = 0; j < matLabels_4.cols; j++) {
         labels_connex4_opencv[i][j] = matLabels_4.at<int>(i, j);
+
+        if (matLabels_4.at<int>(i, j))
+          set_labels_connex4_opencv.insert(matLabels_4.at<int>(i, j));
       }
     }
 
     std::cout << "\n4-connexity connected components (OpenCV):" << std::endl;
     std::cout << "Time: " << t_opencv << " ms" << std::endl;
-    std::cout << "(labels_connex4_opencv == labels_connex4)? " << (labels_connex4_opencv == labels_connex4) << std::endl;
-    if (labels_connex4_opencv != labels_connex4) {
+    std::cout << "nb components: " << set_labels_connex4_opencv.size() << std::endl;
+    bool check_label = checkLabels(labels_connex4_opencv, labels_connex4);
+    std::cout << "checkLabels(labels_connex4_opencv, labels_connex4): " << check_label << std::endl;
+//    std::cout << "(labels_connex4_opencv == labels_connex4)? " << (labels_connex4_opencv == labels_connex4) << std::endl;
+    if (!check_label) {
       throw vpException(vpException::fatalError, "(labels_connex4_opencv != labels_connex4)");
     }
 
@@ -312,18 +365,25 @@ main(int argc, const char ** argv)
     cv::connectedComponents(matImg, matLabels_8, 8);
     t_opencv = vpTime::measureTimeMs() - t_opencv;
 
+    std::set<int> set_labels_connex8_opencv;
     vpImage<int> labels_connex8_opencv((unsigned int) matLabels_8.rows, (unsigned int) matLabels_8.cols);
     for (int i = 0; i < matLabels_8.rows; i++) {
       for (int j = 0; j < matLabels_8.cols; j++) {
         labels_connex8_opencv[i][j] = matLabels_8.at<int>(i, j);
+
+        if (matLabels_8.at<int>(i, j))
+          set_labels_connex8_opencv.insert(matLabels_8.at<int>(i, j));
       }
     }
 
     std::cout << "\n8-connexity connected components (OpenCV):" << std::endl;
+    std::cout << "nb components: " << set_labels_connex8_opencv.size() << std::endl;
     std::cout << "Time: " << t_opencv << " ms" << std::endl;
-    std::cout << "(labels_connex8_opencv == labels_connex8)? " << (labels_connex8_opencv == labels_connex8) << std::endl;
+    check_label = checkLabels(labels_connex8_opencv, labels_connex8);
+    std::cout << "checkLabels(labels_connex8_opencv, labels_connex8): " << check_label << std::endl;
+//    std::cout << "(labels_connex8_opencv == labels_connex8)? " << (labels_connex8_opencv == labels_connex8) << std::endl;
 
-    if (labels_connex8_opencv != labels_connex8) {
+    if (!check_label) {
       throw vpException(vpException::fatalError, "(labels_connex8_opencv != labels_connex8)");
     }
 #endif
