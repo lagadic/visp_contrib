@@ -1,0 +1,13 @@
+/*! \page tutorial_contrib Tutorials in ViSP_contrib
+This page references all the tutorials related to ViSP_contrib.
+
+- \subpage tutorial_contrib_imgproc
+
+*/
+
+/*! \page tutorial_contrib_imgproc Image processing
+This page introduces some image processing methods.
+
+- \subpage tutorial-contrib-imgproc-brightness <br>This tutorial will show you some simple techniques to adjust or improve the brightness / contrast of an image.
+
+*/
