@@ -35,7 +35,6 @@
  *
  *****************************************************************************/
 
-
 /*!
   \file vpImgproc.h
   \brief Basic image processing functions.
@@ -83,9 +82,9 @@ namespace vp
   VISP_EXPORT void gammaCorrection(const vpImage<vpRGBa> &I1, vpImage<vpRGBa> &I2, const double gamma);
 
   VISP_EXPORT void retinex(vpImage<vpRGBa> &I, const int scale=240, const int scaleDiv=3,
-      const int level=RETINEX_UNIFORM, const double dynamic=1.2, const int kernelSize=-1);
+                           const int level=RETINEX_UNIFORM, const double dynamic=1.2, const int kernelSize=-1);
   VISP_EXPORT void retinex(const vpImage<vpRGBa> &I1, vpImage<vpRGBa> &I2, const int scale=240, const int scaleDiv=3,
-      const int level=RETINEX_UNIFORM, const double dynamic=1.2, const int kernelSize=-1);
+                           const int level=RETINEX_UNIFORM, const double dynamic=1.2, const int kernelSize=-1);
 
   VISP_EXPORT void stretchContrast(vpImage<unsigned char> &I);
   VISP_EXPORT void stretchContrast(const vpImage<unsigned char> &I1, vpImage<unsigned char> &I2);
@@ -97,10 +96,10 @@ namespace vp
 
   VISP_EXPORT void unsharpMask(vpImage<unsigned char> &I, const unsigned int size=7, const double weight=0.6);
   VISP_EXPORT void unsharpMask(const vpImage<unsigned char> &I, vpImage<unsigned char> &Ires,
-      const unsigned int size=7, const double weight=0.6);
+                               const unsigned int size=7, const double weight=0.6);
   VISP_EXPORT void unsharpMask(vpImage<vpRGBa> &I, const unsigned int size=7, const double weight=0.6);
   VISP_EXPORT void unsharpMask(const vpImage<vpRGBa> &I, vpImage<vpRGBa> &Ires,
-      const unsigned int size=7, const double weight=0.6);
+                               const unsigned int size=7, const double weight=0.6);
 
   VISP_EXPORT void connectedComponents(const vpImage<unsigned char> &I, vpImage<int> &labels, int &nbComponents,
                                        const vpImageMorphology::vpConnexityType &connexity=vpImageMorphology::CONNEXITY_4);
