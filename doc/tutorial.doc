@@ -9,5 +9,6 @@ This page references all the tutorials related to ViSP_contrib.
 This page introduces some image processing methods.
 
 - \subpage tutorial-contrib-imgproc-brightness <br>This tutorial will show you some simple techniques to adjust or improve the brightness / contrast of an image.
+- \subpage tutorial-contrib-imgproc-autothreshold <br>This tutorial will show you different methods to automatically threshold, binarize an image.
 
 */
