@@ -16,7 +16,7 @@
 
 int main(int argc, const char ** argv) {
   //! [Macro defined]
-#if defined(VISP_HAVE_APRILTAG) && (defined(VISP_HAVE_X11) || defined(VISP_HAVE_GDI) || defined(VISP_HAVE_OPENCV)) && (defined(VISP_HAVE_PNG) || defined(VISP_HAVE_OPENCV))
+#if defined(VISP_HAVE_MODULE_IMGPROC) && (defined(VISP_HAVE_X11) || defined(VISP_HAVE_GDI) || defined(VISP_HAVE_OPENCV)) && (defined(VISP_HAVE_PNG) || defined(VISP_HAVE_OPENCV))
   //! [Macro defined]
   //!
   std::string input_filename = "Sample_low_brightness.png";
