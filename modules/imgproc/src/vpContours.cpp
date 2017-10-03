@@ -72,7 +72,7 @@
 #include <map>
 #include <visp3/imgproc/vpImgproc.h>
 
-
+namespace {
 bool fromTo(const vpImagePoint &from, const vpImagePoint &to, vpDirection &direction) {
   if (from == to) {
     return false;
@@ -124,7 +124,7 @@ bool crossesEastBorder(const vpImage<int> &I, bool checked[8], const vpImagePoin
 }
 
 void addContourPoint(vpImage<int> &I, vp::vpContour *border, const vpImagePoint &point, bool checked[8], const int nbd) {
-  border->m_points.push_back(point);
+  border->m_points.push_back(vpImagePoint(point.get_i()-1, point.get_j()-1)); //remove 1-pixel padding
 
   unsigned int i = (unsigned int) point.get_i();
   unsigned int j = (unsigned int) point.get_j();
@@ -217,7 +217,6 @@ bool isHoleBorderStart(const vpImage<int> &I, unsigned int i, unsigned int j) {
 void getContoursList(const vp::vpContour &root, const int level, vp::vpContour &contour_list) {
   if (level > 0) {
     vp::vpContour *contour_node = new vp::vpContour;
-    contour_node->m_contourPolygon = root.m_contourPolygon;
     contour_node->m_contourType = root.m_contourType;
     contour_node->m_points = root.m_points;
 
@@ -228,6 +227,7 @@ void getContoursList(const vp::vpContour &root, const int level, vp::vpContour &
     getContoursList(**it, level+1, contour_list);
   }
 }
+} //namespace
 
 /*!
   \ingroup group_imgproc_contours
@@ -294,11 +294,16 @@ void vp::findContours(const vpImage<unsigned char> &I_original, vpContour &conto
   //Clear output results
   contourPts.clear();
 
-  vpImage<int> I(I_original.getHeight(), I_original.getWidth());
-  for (unsigned int cpt = 0; cpt < I_original.getSize(); cpt++) {
-    I.bitmap[cpt] = I_original.bitmap[cpt];
+  //Copy uchar I_original into int I + padding
+  vpImage<int> I(I_original.getHeight() + 2, I_original.getWidth() + 2, 0);
+  for (unsigned int i = 1; i < I.getHeight()-1; i++) {
+    for (unsigned int j = 1; j < I.getWidth()-1; j++) {
+      I[i][j] = I_original[i-1][j-1];
+    }
   }
 
+  //Ref: http://openimaj.org/
+  //Ref: Satoshi Suzuki and others. Topological structural analysis of digitized binary images by border following.
   int nbd = 1; //Newest border
   int lnbd = 1; //Last newest border
 
@@ -375,12 +380,9 @@ void vp::findContours(const vpImage<unsigned char> &I_original, vpContour &conto
 
         //(3) (1) ; single pixel contour
         if (border->m_points.empty()) {
-          border->m_points.push_back(ij);
+          border->m_points.push_back(vpImagePoint(ij.get_i()-1, ij.get_j()-1)); //remove 1-pixel padding
           I[i][j] = -nbd;
         }
-
-        //Compute contour polygon
-        border->m_contourPolygon.buildFrom(border->m_points);
 
         if (retrievalMode == CONTOUR_RETR_LIST || retrievalMode == CONTOUR_RETR_TREE) {
           //Add contour points
@@ -415,7 +417,18 @@ void vp::findContours(const vpImage<unsigned char> &I_original, vpContour &conto
   if (retrievalMode == CONTOUR_RETR_EXTERNAL) {
     //Add only external contours
     for (std::vector<vpContour*>::const_iterator it = root->m_children.begin(); it != root->m_children.end(); ++it) {
+      //Save children
+      std::vector<vpContour *> children_copy = (*it)->m_children;
+      //Erase children
+      (*it)->m_children.clear();
+      //Copy contour
       contours.m_children.push_back(new vpContour(**it));
+      //Restore children
+      (*it)->m_children = children_copy;
+      //Set parent to children
+      for (size_t i = 0; i < contours.m_children.size(); i++) {
+        contours.m_children[i]->m_parent = &contours;
+      }
       contourPts.push_back((*it)->m_points);
     }
   } else if (retrievalMode == CONTOUR_RETR_LIST) {
