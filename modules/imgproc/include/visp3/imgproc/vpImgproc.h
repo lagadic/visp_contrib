@@ -58,12 +58,12 @@ namespace vp
   };
 
   typedef enum {
-    AUTO_THRESHOLD_HUANG,       /*!< Huang L.-K. and Wang M.-J.J. (1995) "Image Thresholding by Minimizing the Measures of Fuzziness" Pattern Recognition, 28(1): 41-51 */
-    AUTO_THRESHOLD_INTERMODES,  /*!< Prewitt, JMS & Mendelsohn, ML (1966), "The analysis of cell images", Annals of the New York Academy of Sciences 128: 1035-1053 */
-    AUTO_THRESHOLD_ISODATA,     /*!< Ridler, TW & Calvard, S (1978), "Picture thresholding using an iterative selection method", IEEE Transactions on Systems, Man and Cybernetics 8: 630-632 */
-    AUTO_THRESHOLD_MEAN,        /*!< Glasbey, CA (1993), "An analysis of histogram-based thresholding algorithms", CVGIP: Graphical Models and Image Processing 55: 532-537 */
-    AUTO_THRESHOLD_OTSU,        /*!< Otsu, N (1979), "A threshold selection method from gray-level histograms", IEEE Trans. Sys., Man., Cyber. 9: 62-66, doi:10.1109/TSMC.1979.4310076 */
-    AUTO_THRESHOLD_TRIANGLE     /*!< Zack GW, Rogers WE, Latt SA (1977), "Automatic measurement of sister chromatid exchange frequency", J. Histochem. Cytochem. 25 (7): 741–53, PMID 70454 */
+    AUTO_THRESHOLD_HUANG,       /*!< Huang L.-K. and Wang M.-J.J. (1995) "Image Thresholding by Minimizing the Measures of Fuzziness" Pattern Recognition, 28(1): 41-51 \cite Huang_imagethresholding */
+    AUTO_THRESHOLD_INTERMODES,  /*!< Prewitt, JMS & Mendelsohn, ML (1966), "The analysis of cell images", Annals of the New York Academy of Sciences 128: 1035-1053 \cite NYAS:NYAS1035 */
+    AUTO_THRESHOLD_ISODATA,     /*!< Ridler, TW & Calvard, S (1978), "Picture thresholding using an iterative selection method", IEEE Transactions on Systems, Man and Cybernetics 8: 630-632 \cite article4310039, */
+    AUTO_THRESHOLD_MEAN,        /*!< Glasbey, CA (1993), "An analysis of histogram-based thresholding algorithms", CVGIP: Graphical Models and Image Processing 55: 532-537 \cite Glasbey:1993:AHT:167725.167747 */
+    AUTO_THRESHOLD_OTSU,        /*!< Otsu, N (1979), "A threshold selection method from gray-level histograms", IEEE Trans. Sys., Man., Cyber. 9: 62-66, doi:10.1109/TSMC.1979.4310076 \cite article4310076 */
+    AUTO_THRESHOLD_TRIANGLE     /*!< Zack GW, Rogers WE, Latt SA (1977), "Automatic measurement of sister chromatid exchange frequency", J. Histochem. Cytochem. 25 (7): 741–53, PMID 70454 \cite doi:10.1177/25.7.70454 */
   } vpAutoThresholdMethod;
 
   VISP_EXPORT void adjust(vpImage<unsigned char> &I, const double alpha, const double beta);
