@@ -70,4 +70,8 @@ Here are some steps illustrated with images:
 
 \image html img-tutorial-flood-fill-bucket-fill.png "Raster image after bucket fill"
 
+\section imgproc_flood_fill_next Next tutorial
+
+You can now read the \ref tutorial-contrib-imgproc-count-coins, for a final tutorial that will illustrate some of the image processing techniques presented in these tutorials on a specific use case: how to count the number of coins in an image.
+
 */

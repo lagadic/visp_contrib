@@ -54,4 +54,8 @@ The function vp::autoThreshold(vpImage<unsigned char> &, const vp::vpAutoThresho
   \end{matrix} \right.
 \f]
 
+\section imgproc_autothreshold_next Next tutorial
+
+You can now read the \ref tutorial-contrib-imgproc-contour, to learn how to extract the contours from a binary image.
+
 */

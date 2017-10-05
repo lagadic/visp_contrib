@@ -521,11 +521,11 @@ void vp::stretchContrastHSV(vpImage<vpRGBa> &I) {
   saturationImage.getMinMaxValue(minSaturation, maxSaturation);
   valueImage.getMinMaxValue(minValue, maxValue);
 
-  //Stretch Saturation
   double *ptrStart = saturationImage.bitmap;
   double *ptrEnd = saturationImage.bitmap + size;
   double *ptrCurrent = ptrStart;
 
+  //Stretch Saturation
   if(maxSaturation - minSaturation > 0.0) {
     while(ptrCurrent != ptrEnd) {
       *ptrCurrent = (*ptrCurrent - minSaturation) / (maxSaturation - minSaturation);
@@ -533,6 +533,7 @@ void vp::stretchContrastHSV(vpImage<vpRGBa> &I) {
     }
   }
 
+  //Stretch Value
   if(maxValue - minValue > 0.0) {
     ptrStart = valueImage.bitmap;
     ptrEnd = valueImage.bitmap + size;

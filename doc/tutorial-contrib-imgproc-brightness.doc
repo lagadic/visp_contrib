@@ -77,4 +77,8 @@ The original photo after the Retinex processing:
 
 \image html img-tutorial-brighness-retinex-dynamic-3.png "Left: underexposed image - Right: result of the Retinex algorithm with default parameters and dynamic=3"
 
+\section imgproc_brightness_next Next tutorial
+
+You can now read the \ref tutorial-contrib-imgproc-contrast-sharpening, for additionnal constrast and sharpness improvement techniques.
+
 */
