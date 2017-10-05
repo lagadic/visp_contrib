@@ -29,3 +29,4 @@ visp_add_subdirectory(imgproc/autothreshold                 REQUIRED_DEPS visp_c
 visp_add_subdirectory(imgproc/brightness                    REQUIRED_DEPS visp_core visp_io visp_gui visp_imgproc)
 visp_add_subdirectory(imgproc/contour                       REQUIRED_DEPS visp_core visp_io visp_gui visp_imgproc)
 visp_add_subdirectory(imgproc/flood-fill                    REQUIRED_DEPS visp_core visp_io visp_gui visp_imgproc)
+visp_add_subdirectory(imgproc/count-coins                   REQUIRED_DEPS visp_core visp_io visp_gui visp_imgproc)

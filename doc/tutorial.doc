@@ -12,5 +12,6 @@ This page introduces some image processing methods.
 - \subpage tutorial-contrib-imgproc-autothreshold <br>This tutorial will show you different methods to automatically threshold, binarize an image.
 - \subpage tutorial-contrib-imgproc-contour <br>This tutorial will show you how to extract the contours from a binary image.
 - \subpage tutorial-contrib-imgproc-flood-fill <br>This tutorial will show you how to use the flood fill algorithm.
+- \subpage tutorial-contrib-imgproc-count-coins <br>This tutorial will show you how to count the number of coins in an image.
 
 */

@@ -107,8 +107,6 @@ namespace vp
   VISP_EXPORT void fillHoles(vpImage<unsigned char> &I
 #if USE_OLD_FILL_HOLE
                              , const vpImageMorphology::vpConnexityType &connexity=vpImageMorphology::CONNEXITY_4
-#else
-                             , const unsigned char fillValue=255
 #endif
       );
 
