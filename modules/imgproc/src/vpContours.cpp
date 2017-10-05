@@ -295,10 +295,16 @@ void vp::findContours(const vpImage<unsigned char> &I_original, vpContour &conto
   contourPts.clear();
 
   //Copy uchar I_original into int I + padding
-  vpImage<int> I(I_original.getHeight() + 2, I_original.getWidth() + 2, 0);
-  for (unsigned int i = 1; i < I.getHeight()-1; i++) {
-    for (unsigned int j = 1; j < I.getWidth()-1; j++) {
-      I[i][j] = I_original[i-1][j-1];
+  vpImage<int> I(I_original.getHeight() + 2, I_original.getWidth() + 2);
+  for (unsigned int i = 0; i < I.getHeight(); i++) {
+    if (i == 0 || i == I.getHeight()-1) {
+      memset(I.bitmap, 0, sizeof(int)*I.getWidth());
+    } else {
+      I[i][0] = 0;
+      for (unsigned int j = 0; j < I_original.getWidth(); j++) {
+        I[i][j+1] = I_original[i-1][j];
+      }
+      I[i][I.getWidth()-1] = 0;
     }
   }
 
