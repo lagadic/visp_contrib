@@ -44,7 +44,7 @@
 #include <visp3/core/vpHistogram.h>
 #include <visp3/core/vpImageTools.h>
 
-
+namespace {
 bool isBimodal(const std::vector<float> &hist_float) {
   int modes = 0;
 
@@ -345,6 +345,7 @@ int computeThresholdTriangle(vpHistogram &hist) {
 
   return threshold;
 }
+} //namespace
 
 /*!
   \ingroup group_imgproc_threshold
@@ -357,7 +358,7 @@ int computeThresholdTriangle(vpHistogram &hist) {
   \param foregroundValue : Value to set to the foreground.
 */
 unsigned char vp::autoThreshold(vpImage<unsigned char> &I, const vpAutoThresholdMethod &method, const unsigned char backgroundValue,
-                       const unsigned char foregroundValue) {
+                                const unsigned char foregroundValue) {
   if (I.getSize() == 0) {
     return 0;
   }
@@ -402,4 +403,3 @@ unsigned char vp::autoThreshold(vpImage<unsigned char> &I, const vpAutoThreshold
 
   return threshold;
 }
-

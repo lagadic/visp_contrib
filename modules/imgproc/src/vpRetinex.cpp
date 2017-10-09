@@ -37,7 +37,7 @@
 
 /*!
   \file vpRetinex.cpp
-  \brief Retinex.
+  \brief Retinex algorithm
 */
 
 #include <numeric>
@@ -91,6 +91,7 @@ std::vector<double> retinexScalesDistribution(const int scaleDiv, const int leve
   return scales;
 }
 
+//See: http://imagej.net/Retinex and https://docs.gimp.org/en/plug-in-retinex.html
 void MSRCR(vpImage<vpRGBa> &I, const int _scale, const int scaleDiv,
     const int level, const double dynamic, const int _kernelSize) {
   //Calculate the scales of filtering according to the number of filter and their distribution.
@@ -186,16 +187,10 @@ void MSRCR(vpImage<vpRGBa> &I, const int _scale, const int scaleDiv,
 /*!
   \ingroup group_imgproc_retinex
 
-  Enhance the contrast of a color image using the Retinex technique, based on the Retinex ImageJ plugin:
-  Retinex filtering is based on Land's theory of image perception, proposed to explain the perceived colour constancy
-  of objects under varying illumination conditions. Several approaches exist to implement the retinex principles,
-  among these the multiscale retinex with colour restoration algorithm (MSRCR) combines colour constancy
-  with local contrast enhancement so images are rendered similarly to how human vision is believed to operate.
-  This method is based on the Retinex ImageJ plugin written by Francisco Jiménez Hernández, which is a
-  modified implementation of the Retinex filter from the GIMP package by Fabien Pelisson.
-
+  Apply the Retinex algorithm (the input image is modified).
   \param I : The color image after application of the Retinex technique.
-  \param scale : Specifies the depth of the retinex effect.
+  \param scale : Specifies the depth of the retinex effect. Minimum value is 16, a value providing gross, unrefined filtering.
+  Maximum value is 250. Optimal and default value is 240.
   \param scaleDiv : Specifies the number of iterations of the multiscale filter.
   Values larger than 2 exploit the "multiscale" nature of the algorithm.
   \param level : Specifies distribution of the Gaussian blurring kernel sizes for Scale division values > 2:
@@ -207,14 +202,15 @@ void MSRCR(vpImage<vpRGBa> &I, const int _scale, const int scaleDiv,
 */
 void vp::retinex(vpImage<vpRGBa> &I, const int scale, const int scaleDiv,
     const int level, const double dynamic, const int kernelSize) {
-  //Assert scaleDiv
-  if(scaleDiv < 1 || scaleDiv > 8) {
-    std::cerr << "Scale division must be between the interval [1 - 8]" << std::endl;
+  //Assert scale
+  if(scale < 16 || scale > 250) {
+    std::cerr << "Scale must be between the interval [16 - 250]" << std::endl;
     return;
   }
 
-  if(scale < 0) {
-    std::cerr << "Scale must be positive !" << std::endl;
+  //Assert scaleDiv
+  if(scaleDiv < 1 || scaleDiv > 8) {
+    std::cerr << "Scale division must be between the interval [1 - 8]" << std::endl;
     return;
   }
 
@@ -228,17 +224,11 @@ void vp::retinex(vpImage<vpRGBa> &I, const int scale, const int scaleDiv,
 /*!
   \ingroup group_imgproc_retinex
 
-  Enhance the contrast of a color image using the Retinex technique, based on the Retinex ImageJ plugin:
-  Retinex filtering is based on Land's theory of image perception, proposed to explain the perceived colour constancy
-  of objects under varying illumination conditions. Several approaches exist to implement the retinex principles,
-  among these the multiscale retinex with colour restoration algorithm (MSRCR) combines colour constancy
-  with local contrast enhancement so images are rendered similarly to how human vision is believed to operate.
-  This method is based on the Retinex ImageJ plugin written by Francisco Jiménez Hernández, which is a
-  modified implementation of the Retinex filter from the GIMP package by Fabien Pelisson.
-
+  Apply the Retinex algorithm.
   \param I1 : The input color image.
   \param I2 : The output color image after application of the Retinex technique.
-  \param scale : Specifies the depth of the retinex effect.
+  \param scale : Specifies the depth of the retinex effect. Minimum value is 16, a value providing gross, unrefined filtering.
+  Maximum value is 250. Optimal and default value is 240.
   \param scaleDiv : Specifies the number of iterations of the multiscale filter.
   Values larger than 2 exploit the "multiscale" nature of the algorithm.
   \param level : Specifies distribution of the Gaussian blurring kernel sizes for Scale division values > 2:
@@ -250,21 +240,6 @@ void vp::retinex(vpImage<vpRGBa> &I, const int scale, const int scaleDiv,
 */
 void vp::retinex(const vpImage<vpRGBa> &I1, vpImage<vpRGBa> &I2, const int scale, const int scaleDiv,
     const int level, const double dynamic, const int kernelSize) {
-  //Assert scaleDiv
-  if(scaleDiv < 1 || scaleDiv > 8) {
-    std::cerr << "Scale division must be between the interval [1 - 8]" << std::endl;
-    return;
-  }
-
-  if(scale < 0) {
-    std::cerr << "Scale must be positive !" << std::endl;
-    return;
-  }
-
-  if(I1.getWidth()*I1.getHeight() == 0) {
-    return;
-  }
-
   I2 = I1;
-  MSRCR(I2, scale, scaleDiv, level, dynamic, kernelSize);
+  vp::retinex(I2, scale, scaleDiv, level, dynamic, kernelSize);
 }

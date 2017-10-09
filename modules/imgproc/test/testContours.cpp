@@ -298,18 +298,6 @@ main(int argc, const char ** argv)
     vpImageIo::read(I, filename);
     vpImageTools::binarise(I, (unsigned char) 127, (unsigned char) 255, (unsigned char) 0, (unsigned char) 1, (unsigned char) 1);
 
-    //Remove 1-pixel border to be compatible with the OpenCV method
-    for (unsigned int i = 0; i < I.getHeight(); i++) {
-      if (i == 0 || i == I.getHeight()-1) {
-        for (unsigned int j = 0; j < I.getWidth(); j++) {
-          I[i][j] = 0;
-        }
-      } else {
-        I[i][0] = 0;
-        I[i][I.getWidth()-1] = 0;
-      }
-    }
-
     vpImage<unsigned char> I2(I.getHeight(), I.getWidth());
     for (unsigned int cpt = 0; cpt < I2.getSize(); cpt++) {
       I2.bitmap[cpt] = 255*I.bitmap[cpt];

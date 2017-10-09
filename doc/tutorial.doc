@@ -1,0 +1,19 @@
+/*! \page tutorial_contrib Tutorials in ViSP_contrib
+This page references all the tutorials related to ViSP_contrib.
+
+- \subpage tutorial_contrib_imgproc
+
+*/
+
+/*! \page tutorial_contrib_imgproc Image processing
+This page introduces some image processing methods.
+
+- \subpage tutorial-contrib-imgproc-brightness <br>This tutorial will show you some simple techniques to adjust or improve the brightness / contrast of an image.
+- \subpage tutorial-contrib-imgproc-contrast-sharpening <br>This tutorial will show you some simple techniques to improve the contrast and the sharpness of an image.
+- \subpage tutorial-contrib-imgproc-autothreshold <br>This tutorial will show you different methods to automatically threshold, binarize an image.
+- \subpage tutorial-contrib-imgproc-contour <br>This tutorial will show you how to extract the contours from a binary image.
+- \subpage tutorial-contrib-imgproc-connected-components <br>This tutorial will show you how to do a connected-components labeling.
+- \subpage tutorial-contrib-imgproc-flood-fill <br>This tutorial will show you how to use the flood fill algorithm.
+- \subpage tutorial-contrib-imgproc-count-coins <br>This tutorial will show you how to count the number of coins in an image.
+
+*/

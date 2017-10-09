@@ -145,23 +145,22 @@ namespace vp
 
   struct vpContour {
     std::vector<vpContour *> m_children;
-    vpPolygon m_contourPolygon;
     vpContourType m_contourType;
     vpContour *m_parent;
     std::vector<vpImagePoint> m_points;
 
     vpContour() :
-      m_children(), m_contourPolygon(), m_contourType(vp::CONTOUR_HOLE), m_parent(NULL), m_points() {
+      m_children(), m_contourType(vp::CONTOUR_HOLE), m_parent(NULL), m_points() {
     }
 
     vpContour(const vpContourType &type) :
-      m_children(), m_contourPolygon(), m_contourType(type), m_parent(NULL), m_points() {
+      m_children(), m_contourType(type), m_parent(NULL), m_points() {
     }
 
     vpContour(const vpContour &contour) :
-      m_children(), m_contourPolygon(contour.m_contourPolygon), m_contourType(contour.m_contourType), m_parent(NULL), m_points(contour.m_points) {
+      m_children(), m_contourType(contour.m_contourType), m_parent(NULL), m_points(contour.m_points) {
 
-      //Copy only the underlying contours
+      //Copy the underlying contours
       for (std::vector<vpContour *>::const_iterator it = contour.m_children.begin(); it != contour.m_children.end(); ++it) {
         vpContour *copy = new vpContour( **it );
         copy->m_parent = this;
@@ -180,7 +179,6 @@ namespace vp
     }
 
     vpContour& operator=(const vpContour &other) {
-      m_contourPolygon = other.m_contourPolygon;
       m_contourType = other.m_contourType;
 
       if (m_parent == NULL) {
@@ -226,4 +224,3 @@ namespace vp
 }
 
 #endif
-

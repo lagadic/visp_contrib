@@ -33,7 +33,16 @@
 /*!
   \ingroup module_imgproc
   \defgroup group_imgproc_retinex Retinex
-  Retinex.
+  Enhance the contrast of a color image using the Retinex technique, based on the Retinex ImageJ plugin:
+  <blockquote>
+  Retinex filtering is based on Land's theory of image perception, proposed to explain the perceived colour constancy
+  of objects under varying illumination conditions. Several approaches exist to implement the retinex principles,
+  among these the multiscale retinex with colour restoration algorithm (MSRCR) combines colour constancy
+  with local contrast enhancement so images are rendered similarly to how human vision is believed to operate.
+  </blockquote>
+  This method is based on the <a href="http://imagej.net/Retinex">Retinex ImageJ</a> plugin written by Francisco Jiménez Hernández,
+  which is a modified implementation of the Retinex filter from the <a href="https://docs.gimp.org/en/plug-in-retinex.html">GIMP package</a>
+  by Fabien Pelisson.
 */
 /*!
   \ingroup module_imgproc

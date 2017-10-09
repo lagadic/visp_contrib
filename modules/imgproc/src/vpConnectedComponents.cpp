@@ -43,7 +43,7 @@
 #include <queue>
 #include <visp3/imgproc/vpImgproc.h>
 
-
+namespace {
 void getNeighbors(const vpImage<unsigned char> &I, std::queue<vpImagePoint> &listOfNeighbors,
                   const unsigned int i, const unsigned int j,
                   const vpImageMorphology::vpConnexityType &connexity) {
@@ -101,6 +101,7 @@ void visitNeighbors(vpImage<unsigned char> &I_copy, std::queue<vpImagePoint> &li
     }
   }
 }
+} //namespace
 
 /*!
   \ingroup group_imgproc_connected_components
@@ -124,9 +125,7 @@ void vp::connectedComponents(const vpImage<unsigned char> &I, vpImage<int> &labe
   // Copy and add border
   for (unsigned int i = 0; i < I_copy.getHeight(); i++) {
     if (i == 0 || i == I_copy.getHeight() - 1) {
-      for (unsigned int j = 0; j < I_copy.getWidth(); j++) {
-        I_copy[i][j] = 0;
-      }
+      memset(I_copy[i], 0, sizeof(unsigned char)*I_copy.getWidth());
     } else {
       I_copy[i][0] = 0;
       memcpy(I_copy[i]+1, I[i-1], sizeof(unsigned char)*I.getWidth());
