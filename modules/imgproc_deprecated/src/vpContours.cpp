@@ -70,7 +70,7 @@
 */
 
 #include <map>
-#include <visp3/imgproc/vpImgproc.h>
+#include <visp3/imgproc_deprecated/vpImgproc.h>
 
 namespace {
 bool fromTo(const vpImagePoint &from, const vpImagePoint &to, vpDirection &direction) {

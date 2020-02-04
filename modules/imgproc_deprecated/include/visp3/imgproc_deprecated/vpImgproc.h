@@ -46,7 +46,7 @@
 
 #include <visp3/core/vpImage.h>
 #include <visp3/core/vpImageMorphology.h>
-#include <visp3/imgproc/vpContours.h>
+#include <visp3/imgproc_deprecated/vpContours.h>
 
 #define USE_OLD_FILL_HOLE 0
 

@@ -40,7 +40,7 @@
   \brief Basic image processing functions.
 */
 
-#include <visp3/imgproc/vpImgproc.h>
+#include <visp3/imgproc_deprecated/vpImgproc.h>
 #include <visp3/core/vpMath.h>
 #include <visp3/core/vpHistogram.h>
 #include <visp3/core/vpImageConvert.h>

@@ -40,7 +40,7 @@
   \brief Additional image morphology functions.
 */
 
-#include <visp3/imgproc/vpImgproc.h>
+#include <visp3/imgproc_deprecated/vpImgproc.h>
 #include <visp3/core/vpImageTools.h>
 
 /*!
