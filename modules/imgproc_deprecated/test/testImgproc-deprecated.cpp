@@ -40,7 +40,7 @@
 #include <visp3/io/vpParseArgv.h>
 #include <visp3/core/vpIoTools.h>
 #include <visp3/core/vpMath.h>
-#include <visp3/imgproc/vpImgproc.h>
+#include <visp3/imgproc_deprecated/vpImgproc.h>
 #include <stdlib.h>
 #include <stdio.h>
 
