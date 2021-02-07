@@ -1,12 +1,12 @@
-project(tutorial-flood-fill)
+project(tutorial-flood-fill-contrib)
 
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.0)
 
-find_package(VISP REQUIRED visp_core visp_io visp_gui visp_imgproc)
+find_package(VISP REQUIRED visp_core visp_io visp_gui visp_imgproc_contrib)
 
 # set the list of source files
 set(tutorial_cpp
-  tutorial-flood-fill.cpp)
+  tutorial-flood-fill-contrib.cpp)
 
 foreach(cpp ${tutorial_cpp})
   visp_add_target(${cpp})

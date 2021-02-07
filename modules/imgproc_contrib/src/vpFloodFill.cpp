@@ -41,7 +41,7 @@
 */
 
 #include <queue>
-#include <visp3/imgproc_deprecated/vpImgproc.h>
+#include <visp3/imgproc_contrib/vpImgproc.h>
 
 
 /*!

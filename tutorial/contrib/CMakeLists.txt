@@ -1,6 +1,6 @@
-project(ViSP_contrib-tutorial)
+project(visp_contrib-tutorial)
 
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.0)
 
 find_package(VISP REQUIRED)
 
@@ -25,10 +25,10 @@ if(MSVC)
   endif()
 endif()
 
-visp_add_subdirectory(imgproc/autothreshold                 REQUIRED_DEPS visp_core visp_io visp_gui visp_imgproc)
-visp_add_subdirectory(imgproc/brightness                    REQUIRED_DEPS visp_core visp_io visp_gui visp_imgproc)
-visp_add_subdirectory(imgproc/connected-components          REQUIRED_DEPS visp_core visp_io visp_gui visp_imgproc)
-visp_add_subdirectory(imgproc/contour                       REQUIRED_DEPS visp_core visp_io visp_gui visp_imgproc)
-visp_add_subdirectory(imgproc/contrast-sharpening           REQUIRED_DEPS visp_core visp_io visp_gui visp_imgproc)
-visp_add_subdirectory(imgproc/count-coins                   REQUIRED_DEPS visp_core visp_io visp_gui visp_imgproc)
-visp_add_subdirectory(imgproc/flood-fill                    REQUIRED_DEPS visp_core visp_io visp_gui visp_imgproc)
+visp_add_subdirectory(imgproc_contrib/autothreshold                 REQUIRED_DEPS visp_core visp_io visp_gui visp_imgproc)
+visp_add_subdirectory(imgproc_contrib/brightness                    REQUIRED_DEPS visp_core visp_io visp_gui visp_imgproc)
+visp_add_subdirectory(imgproc_contrib/connected-components          REQUIRED_DEPS visp_core visp_io visp_gui visp_imgproc)
+visp_add_subdirectory(imgproc_contrib/contour                       REQUIRED_DEPS visp_core visp_io visp_gui visp_imgproc)
+visp_add_subdirectory(imgproc_contrib/contrast-sharpening           REQUIRED_DEPS visp_core visp_io visp_gui visp_imgproc)
+visp_add_subdirectory(imgproc_contrib/count-coins                   REQUIRED_DEPS visp_core visp_io visp_gui visp_imgproc)
+visp_add_subdirectory(imgproc_contrib/flood-fill                    REQUIRED_DEPS visp_core visp_io visp_gui visp_imgproc)

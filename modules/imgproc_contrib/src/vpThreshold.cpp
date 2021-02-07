@@ -40,7 +40,7 @@
   \brief Automatic thresholding functions.
 */
 
-#include <visp3/imgproc_deprecated/vpImgproc.h>
+#include <visp3/imgproc_contrib/vpImgproc.h>
 #include <visp3/core/vpHistogram.h>
 #include <visp3/core/vpImageTools.h>
 

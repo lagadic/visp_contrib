@@ -43,7 +43,7 @@
 #include <numeric>
 #include <functional>
 
-#include <visp3/imgproc_deprecated/vpImgproc.h>
+#include <visp3/imgproc_contrib/vpImgproc.h>
 #include <visp3/core/vpMath.h>
 #include <visp3/core/vpImageFilter.h>
 

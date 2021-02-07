@@ -37,7 +37,7 @@
 
 # This module is deprecated since it was introduces a while in ViSP.
 # We keep it here in visp_contrib to give an example
-vp_add_module(imgproc_deprecated visp_core)
+vp_add_module(imgproc_contrib visp_core)
 
 # You can add cmake specific material like Find<Package>.cmake files in a specific
 # folder named for example "cmake" and uncomment the following line to use it.
