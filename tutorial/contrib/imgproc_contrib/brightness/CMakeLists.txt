@@ -1,6 +1,6 @@
 project(tutorial-brightness-adjustment-contrib)
 
-cmake_minimum_required(VERSION 3.0)
+1
 
 find_package(VISP REQUIRED visp_core visp_io visp_gui visp_imgproc_contrib)
 
