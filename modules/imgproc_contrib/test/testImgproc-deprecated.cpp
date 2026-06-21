@@ -45,18 +45,18 @@
 #include <stdio.h>
 
 
-/*!
-  \example testImgproc.cpp
+ /*!
+   \example testImgproc.cpp
 
-  \brief Test imgproc functions.
+   \brief Test imgproc functions.
 
-*/
+ */
 
-// List of allowed command line options
+ // List of allowed command line options
 #define GETOPTARGS  "cdi:o:h"
 
-void usage(const char *name, const char *badparam, std::string ipath, std::string opath, std::string user);
-bool getOptions(int argc, const char **argv, std::string &ipath, std::string &opath, std::string user);
+void usage(const char* name, const char* badparam, std::string ipath, std::string opath, std::string user);
+bool getOptions(int argc, const char** argv, std::string& ipath, std::string& opath, std::string user);
 
 /*
 
@@ -69,8 +69,7 @@ bool getOptions(int argc, const char **argv, std::string &ipath, std::string &op
   \param user : Username.
 
  */
-void usage(const char *name, const char *badparam, std::string ipath, std::string opath, std::string user)
-{
+void usage(const char* name, const char* badparam, std::string ipath, std::string opath, std::string user) {
   fprintf(stdout, "\n\
 Test imgproc functions.\n\
 \n\
@@ -97,11 +96,11 @@ OPTIONS:                                               Default\n\
 \n\
   -h\n\
      Print the help.\n\n",
-    ipath.c_str(), opath.c_str(), user.c_str());
+          ipath.c_str(), opath.c_str(), user.c_str());
 
   if (badparam)
     fprintf(stdout, "\nERROR: Bad parameter [%s]\n", badparam);
-}
+  }
 
 /*!
 
@@ -115,25 +114,24 @@ OPTIONS:                                               Default\n\
   \return false if the program has to be stopped, true otherwise.
 
 */
-bool getOptions(int argc, const char **argv, std::string &ipath, std::string &opath, std::string user)
-{
-  const char *optarg_;
+bool getOptions(int argc, const char** argv, std::string& ipath, std::string& opath, std::string user) {
+  const char* optarg_;
   int c;
   while ((c = vpParseArgv::parse(argc, argv, GETOPTARGS, &optarg_)) > 1) {
 
     switch (c) {
-    case 'i': ipath = optarg_; break;
-    case 'o': opath = optarg_; break;
-    case 'h': usage(argv[0], NULL, ipath, opath, user); return false; break;
+      case 'i': ipath = optarg_; break;
+      case 'o': opath = optarg_; break;
+      case 'h': usage(argv[0], NULL, ipath, opath, user); return false; break;
 
-    case 'c':
-    case 'd':
-      break;
+      case 'c':
+      case 'd':
+        break;
 
-    default:
-      usage(argv[0], optarg_, ipath, opath, user); return false; break;
+      default:
+        usage(argv[0], optarg_, ipath, opath, user); return false; break;
+      }
     }
-  }
 
   if ((c == 1) || (c == -1)) {
     // standalone param or error
@@ -141,10 +139,10 @@ bool getOptions(int argc, const char **argv, std::string &ipath, std::string &op
     std::cerr << "ERROR: " << std::endl;
     std::cerr << "  Bad argument " << optarg_ << std::endl << std::endl;
     return false;
-  }
+    }
 
   return true;
-}
+  }
 
 /*!
   Using a look-up table, adjust the pixel intensities.
@@ -152,13 +150,12 @@ bool getOptions(int argc, const char **argv, std::string &ipath, std::string &op
   \param I : Input color image.
   \param lut : Look-up table mapping for each intensity the new corresponding value.
 */
-void lut_method(vpImage<vpRGBa> &I, const vpRGBa (&lut)[256]) {
+void lut_method(vpImage<vpRGBa>& I, const vpRGBa(&lut)[256]) {
   I.performLut(lut);
-}
+  }
 
 int
-main(int argc, const char ** argv)
-{
+main(int argc, const char** argv) {
   try {
     std::string env_ipath;
     std::string opt_ipath;
@@ -172,7 +169,7 @@ main(int argc, const char ** argv)
     env_ipath = vpIoTools::getViSPImagesDataPath();
 
     // Set the default input path
-    if (! env_ipath.empty())
+    if (!env_ipath.empty())
       ipath = env_ipath;
 
     // Set the default output path
@@ -187,8 +184,8 @@ main(int argc, const char ** argv)
 
     // Read the command line options
     if (getOptions(argc, argv, opt_ipath, opt_opath, username) == false) {
-      exit (-1);
-    }
+      exit(-1);
+      }
 
     // Get the option values
     if (!opt_ipath.empty())
@@ -204,40 +201,40 @@ main(int argc, const char ** argv)
       try {
         // Create the dirname
         vpIoTools::makeDirectory(opath);
-      }
+        }
       catch (...) {
         usage(argv[0], NULL, ipath, opt_opath, username);
         std::cerr << std::endl
-                  << "ERROR:" << std::endl;
+          << "ERROR:" << std::endl;
         std::cerr << "  Cannot create " << opath << std::endl;
         std::cerr << "  Check your -o " << opt_opath << " option " << std::endl;
         exit(-1);
+        }
       }
-    }
 
     // Compare ipath and env_ipath. If they differ, we take into account
     // the input path comming from the command line option
     if (!opt_ipath.empty() && !env_ipath.empty()) {
       if (ipath != env_ipath) {
         std::cout << std::endl
-                  << "WARNING: " << std::endl;
+          << "WARNING: " << std::endl;
         std::cout << "  Since -i <visp image path=" << ipath << "> "
-                  << "  is different from VISP_IMAGE_PATH=" << env_ipath << std::endl
-                  << "  we skip the environment variable." << std::endl;
+          << "  is different from VISP_IMAGE_PATH=" << env_ipath << std::endl
+          << "  we skip the environment variable." << std::endl;
+        }
       }
-    }
 
     // Test if an input path is set
-    if (opt_ipath.empty() && env_ipath.empty()){
+    if (opt_ipath.empty() && env_ipath.empty()) {
       usage(argv[0], NULL, ipath, opt_opath, username);
       std::cerr << std::endl
-                << "ERROR:" << std::endl;
+        << "ERROR:" << std::endl;
       std::cerr << "  Use -i <visp image path> option or set VISP_INPUT_IMAGE_PATH "
-                << std::endl
-                << "  environment variable to specify the location of the " << std::endl
-                << "  image path where test images are located." << std::endl << std::endl;
+        << std::endl
+        << "  environment variable to specify the location of the " << std::endl
+        << "  image path where test images are located." << std::endl << std::endl;
       exit(-1);
-    }
+      }
 
 
     //
@@ -346,9 +343,18 @@ main(int argc, const char ** argv)
     //
     //Test grayscale function using image0000.pgm
     //
-
+#if defined(VISP_HAVE_DATASET)
+#if VISP_HAVE_DATASET_VERSION >= 0x030600
+    std::string ext("png");
+#else
+    std::string ext("pgm");
+#endif
+#else
+  // We suppose that the user will download a recent dataset
+    std::string ext("png");
+#endif
     //Read image0000.pgm
-    filename = vpIoTools::createFilePath(ipath, "mbt/cube/image0000.pgm");
+    filename = vpIoTools::createFilePath(ipath, "mbt/cube/image0000." + ext);
     vpImage<unsigned char> I;
     std::cout << "\nRead image: " << filename << std::endl;
     vpImageIo::read(I, filename);
@@ -418,9 +424,9 @@ main(int argc, const char ** argv)
 
 
     return 0;
-  }
-  catch(vpException &e) {
+    }
+  catch (vpException& e) {
     std::cerr << "Catch an exception: " << e.what() << std::endl;
     return 1;
+    }
   }
-}
