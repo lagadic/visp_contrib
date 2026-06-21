@@ -1,7 +1,6 @@
-/****************************************************************************
- *
+/*
  * This file is part of the ViSP software.
- * Copyright (C) 2005 - 2016 by Inria. All rights reserved.
+ * Copyright (C) 2005 - 2025 by Inria. All rights reserved.
  *
  * This software is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -29,11 +28,7 @@
  *
  * Description:
  * Additional image morphology functions.
- *
- * Authors:
- * Souriya Trinh
- *
- *****************************************************************************/
+ */
 
 /*!
   \file vpMorph.cpp
@@ -54,7 +49,8 @@ void vp::fillHoles(vpImage<unsigned char> &I
 #if USE_OLD_FILL_HOLE
                    , const vpImageMorphology::vpConnexityType &connexity
 #endif
-                   ) {
+)
+{
   if (I.getSize() == 0) {
     return;
   }
@@ -71,20 +67,21 @@ void vp::fillHoles(vpImage<unsigned char> &I
   //Copy I to mask + add border padding + complement
   for (unsigned int i = 0; i < I.getHeight(); i++) {
     for (unsigned int j = 0; j < I.getWidth(); j++) {
-      mask[i+1][j+1] = 255 - I[i][j];
+      mask[i + 1][j + 1] = 255 - I[i][j];
     }
   }
 
   vpImage<unsigned char> marker(I.getHeight() + 2, I.getWidth() + 2, 0);
   //Create marker with 255 1-pixel border
   for (unsigned int i = 0; i < marker.getHeight(); i++) {
-    if (i == 0 || i == marker.getHeight()-1) {
+    if (i == 0 || i == marker.getHeight() - 1) {
       for (unsigned int j = 0; j < marker.getWidth(); j++) {
         marker[i][j] = 255;
       }
-    } else {
+    }
+    else {
       marker[i][0] = 255;
-      marker[i][marker.getWidth()-1] = 255;
+      marker[i][marker.getWidth() - 1] = 255;
     }
   }
 
@@ -93,7 +90,7 @@ void vp::fillHoles(vpImage<unsigned char> &I
 
   for (unsigned int i = 0; i < I.getHeight(); i++) {
     for (unsigned int j = 0; j < I.getWidth(); j++) {
-      I[i][j] = 255 - I_reconstruct[i+1][j+1];
+      I[i][j] = 255 - I_reconstruct[i + 1][j + 1];
     }
   }
 #else
@@ -101,16 +98,16 @@ void vp::fillHoles(vpImage<unsigned char> &I
   vpImage<unsigned char> flood_fill_mask(I.getHeight() + 2, I.getWidth() + 2, 0);
   //Copy I to mask + add border padding
   for (unsigned int i = 0; i < I.getHeight(); i++) {
-    memcpy(flood_fill_mask[i+1]+1, I[i], sizeof(unsigned char)*I.getWidth());
+    memcpy(flood_fill_mask[i + 1] + 1, I[i], sizeof(unsigned char) * I.getWidth());
   }
 
   //Perform flood fill
-  vp::floodFill(flood_fill_mask, vpImagePoint(0,0), 0, 255);
+  vp::floodFill(flood_fill_mask, vpImagePoint(0, 0), 0, 255);
 
   //Get current mask
   vpImage<unsigned char> mask(I.getHeight(), I.getWidth());
   for (unsigned int i = 0; i < mask.getHeight(); i++) {
-    memcpy(mask[i], flood_fill_mask[i+1]+1, sizeof(unsigned char)*mask.getWidth());
+    memcpy(mask[i], flood_fill_mask[i + 1] + 1, sizeof(unsigned char) * mask.getWidth());
   }
 
   //Get image with holes filled
@@ -138,7 +135,8 @@ void vp::fillHoles(vpImage<unsigned char> &I
   \param connexity : Type of connexity.
 */
 void vp::reconstruct(const vpImage<unsigned char> &marker, const vpImage<unsigned char> &mask, vpImage<unsigned char> &h_kp1 /*alias I */,
-                     const vpImageMorphology::vpConnexityType &connexity) {
+                     const vpImageMorphology::vpConnexityType &connexity)
+{
   if (marker.getHeight() != mask.getHeight() || marker.getWidth() != mask.getWidth()) {
     std::cerr << "marker.getHeight() != mask.getHeight() || marker.getWidth() != mask.getWidth()" << std::endl;
     return;
@@ -154,12 +152,12 @@ void vp::reconstruct(const vpImage<unsigned char> &marker, const vpImage<unsigne
 
   do {
     //Dilatation
-    vpImageMorphology::dilatation(h_kp1, connexity);
+    vpImageMorphology::dilatation<unsigned char>(h_kp1, connexity);
 
     //Keep min
     for (unsigned int i = 0; i < h_kp1.getHeight(); i++) {
       for (unsigned int j = 0; j < h_kp1.getWidth(); j++) {
-        h_kp1[i][j] = std::min(h_kp1[i][j], mask[i][j]);
+        h_kp1[i][j] = std::min<unsigned char>(h_kp1[i][j], mask[i][j]);
       }
     }
 
