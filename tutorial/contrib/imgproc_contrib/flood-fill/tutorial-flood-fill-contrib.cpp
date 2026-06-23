@@ -13,128 +13,143 @@
 //! [Include]
 #endif
 
-namespace {
+#ifdef ENABLE_VISP_NAMESPACE
+using namespace  VISP_NAMESPACE_NAME;
+#endif
+namespace
+{
 //! [Bresenham's line algorithm]
-vpImagePoint switchToOctantZeroFrom(const int octant, const vpImagePoint &imPt) {
+vpImagePoint switchToOctantZeroFrom(const int octant, const vpImagePoint &imPt)
+{
   vpImagePoint imPt_switched = imPt;
 
-   switch(octant) {
-     case 0: //return (x, y)
-       imPt_switched.set_uv(imPt.get_u(), imPt.get_v());
-       break;
+  switch (octant) {
+  case 0: //return (x, y)
+    imPt_switched.set_uv(imPt.get_u(), imPt.get_v());
+    break;
 
-     case 1: //return (y, x)
-       imPt_switched.set_uv(imPt.get_v(), imPt.get_u());
-       break;
+  case 1: //return (y, x)
+    imPt_switched.set_uv(imPt.get_v(), imPt.get_u());
+    break;
 
-     case 2: //return (y, -x)
-       imPt_switched.set_uv(imPt.get_v(), -imPt.get_u());
-       break;
+  case 2: //return (y, -x)
+    imPt_switched.set_uv(imPt.get_v(), -imPt.get_u());
+    break;
 
-     case 3: //return (-x, y)
-       imPt_switched.set_uv(-imPt.get_u(), imPt.get_v());
-       break;
+  case 3: //return (-x, y)
+    imPt_switched.set_uv(-imPt.get_u(), imPt.get_v());
+    break;
 
-     case 4: //return (-x, -y)
-       imPt_switched.set_uv(-imPt.get_u(), -imPt.get_v());
-       break;
+  case 4: //return (-x, -y)
+    imPt_switched.set_uv(-imPt.get_u(), -imPt.get_v());
+    break;
 
-     case 5: //return (-y, -x)
-       imPt_switched.set_uv(-imPt.get_v(), -imPt.get_u());
-       break;
+  case 5: //return (-y, -x)
+    imPt_switched.set_uv(-imPt.get_v(), -imPt.get_u());
+    break;
 
-     case 6: //return (-y, x)
-       imPt_switched.set_uv(-imPt.get_v(), imPt.get_u());
-       break;
+  case 6: //return (-y, x)
+    imPt_switched.set_uv(-imPt.get_v(), imPt.get_u());
+    break;
 
-     case 7: //return (x, -y)
-       imPt_switched.set_uv(imPt.get_u(), -imPt.get_v());
-       break;
+  case 7: //return (x, -y)
+    imPt_switched.set_uv(imPt.get_u(), -imPt.get_v());
+    break;
 
-     default:
-       break;
-   }
+  default:
+    break;
+  }
 
-   return imPt_switched;
+  return imPt_switched;
 }
 
-vpImagePoint switchFromOctantZeroTo(const int octant, const vpImagePoint &imPt) {
+vpImagePoint switchFromOctantZeroTo(const int octant, const vpImagePoint &imPt)
+{
   vpImagePoint imPt_switched = imPt;
 
-   switch(octant) {
-     case 0: //return (x, y)
-       imPt_switched.set_uv(imPt.get_u(), imPt.get_v());
-       break;
+  switch (octant) {
+  case 0: //return (x, y)
+    imPt_switched.set_uv(imPt.get_u(), imPt.get_v());
+    break;
 
-     case 1: //return (y, x)
-       imPt_switched.set_uv(imPt.get_v(), imPt.get_u());
-       break;
+  case 1: //return (y, x)
+    imPt_switched.set_uv(imPt.get_v(), imPt.get_u());
+    break;
 
-     case 2: //return (-y, x)
-       imPt_switched.set_uv(-imPt.get_v(), imPt.get_u());
-       break;
+  case 2: //return (-y, x)
+    imPt_switched.set_uv(-imPt.get_v(), imPt.get_u());
+    break;
 
-     case 3: //return (-x, y)
-       imPt_switched.set_uv(-imPt.get_u(), imPt.get_v());
-       break;
+  case 3: //return (-x, y)
+    imPt_switched.set_uv(-imPt.get_u(), imPt.get_v());
+    break;
 
-     case 4: //return (-x, -y)
-       imPt_switched.set_uv(-imPt.get_u(), -imPt.get_v());
-       break;
+  case 4: //return (-x, -y)
+    imPt_switched.set_uv(-imPt.get_u(), -imPt.get_v());
+    break;
 
-     case 5: //return (-y, -x)
-       imPt_switched.set_uv(-imPt.get_v(), -imPt.get_u());
-       break;
+  case 5: //return (-y, -x)
+    imPt_switched.set_uv(-imPt.get_v(), -imPt.get_u());
+    break;
 
-     case 6: //return (y, -x)
-       imPt_switched.set_uv(imPt.get_v(), -imPt.get_u());
-       break;
+  case 6: //return (y, -x)
+    imPt_switched.set_uv(imPt.get_v(), -imPt.get_u());
+    break;
 
-     case 7: //return (x, -y)
-       imPt_switched.set_uv(imPt.get_u(), -imPt.get_v());
-       break;
+  case 7: //return (x, -y)
+    imPt_switched.set_uv(imPt.get_u(), -imPt.get_v());
+    break;
 
-     default:
-       break;
-   }
+  default:
+    break;
+  }
 
-   return imPt_switched;
+  return imPt_switched;
 }
 
-int getOctant(const vpImagePoint &imPt1, const vpImagePoint &imPt2) {
+int getOctant(const vpImagePoint &imPt1, const vpImagePoint &imPt2)
+{
   double dx = imPt2.get_u() - imPt1.get_u();
   double dy = imPt2.get_v() - imPt1.get_v();
 
   if (dx >= 0 && dy >= 0) {
     if (dy >= dx) {
       return 1;
-    } else {
+    }
+    else {
       return 0;
     }
-  } else if (dx < 0 && dy >= 0) {
+  }
+  else if (dx < 0 && dy >= 0) {
     if (-dx >= dy) {
       return 3;
-    } else {
+    }
+    else {
       return 2;
     }
-  } else if (dx < 0 && dy < 0) {
+  }
+  else if (dx < 0 && dy < 0) {
     if (dy <= dx) {
       return 5;
-    } else {
+    }
+    else {
       return 4;
     }
-  } else {
+  }
+  else {
     if (dx >= -dy) {
       return 7;
-    } else {
+    }
+    else {
       return 6;
     }
   }
 }
 
-void drawLine(vpImage<unsigned char> &I, const unsigned char value, const vpImagePoint &imPt1_, const vpImagePoint &imPt2_) {
-  vpImagePoint imPt1((int) imPt1_.get_v(), (int) imPt1_.get_u());
-  vpImagePoint imPt2((int) imPt2_.get_v(), (int) imPt2_.get_u());
+void drawLine(vpImage<unsigned char> &I, const unsigned char value, const vpImagePoint &imPt1_, const vpImagePoint &imPt2_)
+{
+  vpImagePoint imPt1((int)imPt1_.get_v(), (int)imPt1_.get_u());
+  vpImagePoint imPt2((int)imPt2_.get_v(), (int)imPt2_.get_u());
 
   int octant = getOctant(imPt1, imPt2);
   imPt1 = switchToOctantZeroFrom(octant, imPt1);
@@ -145,12 +160,12 @@ void drawLine(vpImage<unsigned char> &I, const unsigned char value, const vpImag
   double D = 2*dy -dx;
   double y = imPt1.get_v();
 
-  for (int x = (int) imPt1.get_u(); x <= (int) imPt2.get_u(); x++) {
+  for (int x = (int)imPt1.get_u(); x <= (int)imPt2.get_u(); x++) {
     vpImagePoint currentPt(y, x);
     currentPt = switchFromOctantZeroTo(octant, currentPt);
 
-    unsigned int i = std::min(I.getHeight()-1, (unsigned int) std::max(0.0, currentPt.get_i()));
-    unsigned int j = std::min(I.getWidth()-1, (unsigned int) std::max(0.0, currentPt.get_j()));
+    unsigned int i = std::min(I.getHeight()-1, (unsigned int)std::max(0.0, currentPt.get_i()));
+    unsigned int j = std::min(I.getWidth()-1, (unsigned int)std::max(0.0, currentPt.get_j()));
     I[i][j] = value;
 
     if (D >= 0) {
@@ -164,8 +179,9 @@ void drawLine(vpImage<unsigned char> &I, const unsigned char value, const vpImag
 //! [Bresenham's line algorithm]
 } //namespace
 
-int main() {
-  //! [Macro defined]
+int main()
+{
+//! [Macro defined]
 #if defined(VISP_HAVE_MODULE_IMGPROC) && (defined(VISP_HAVE_X11) || defined(VISP_HAVE_GDI) || defined(VISP_HAVE_OPENCV))
   //! [Macro defined]
 
@@ -230,25 +246,25 @@ int main() {
     //! [Seed point click]
     {
       switch (button) {
-        case vpMouseButton::button1:
-          //! [Flood fill]
-          vp::floodFill(mask, ip, 0, 255, vpImageMorphology::CONNEXITY_4);
-          //! [Flood fill]
+      case vpMouseButton::button1:
+        //! [Flood fill]
+        vp::floodFill(mask, ip, 0, 255, vpImageMorphology::CONNEXITY_4);
+        //! [Flood fill]
 
-          //! [Bucket fill]
-          for (unsigned int cpt = 0; cpt < mask.getSize(); cpt++) {
-            if (mask.bitmap[cpt])
-              I.bitmap[cpt] = vpColor::red;
-          }
-          //! [Bucket fill]
-          break;
+        //! [Bucket fill]
+        for (unsigned int cpt = 0; cpt < mask.getSize(); cpt++) {
+          if (mask.bitmap[cpt])
+            I.bitmap[cpt] = vpColor::red;
+        }
+        //! [Bucket fill]
+        break;
 
-        case vpMouseButton::button3:
-          quit = true;
-          break;
+      case vpMouseButton::button3:
+        quit = true;
+        break;
 
-        default:
-          break;
+      default:
+        break;
       }
     }
   }

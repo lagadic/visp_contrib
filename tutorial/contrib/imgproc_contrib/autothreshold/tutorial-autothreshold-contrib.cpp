@@ -1,34 +1,37 @@
-//! \example tutorial-autothreshold.cpp
+//! \example tutorial-autothreshold-contrib.cpp
 
 #include <cstdlib>
 #include <iostream>
+#include <visp3/core/vpConfig.h>
 #include <visp3/core/vpImage.h>
+#include <visp3/gui/vpDisplayFactory.h>
 #include <visp3/io/vpImageIo.h>
-#include <visp3/gui/vpDisplayGDI.h>
-#include <visp3/gui/vpDisplayOpenCV.h>
-#include <visp3/gui/vpDisplayX.h>
 
 #if defined(VISP_HAVE_MODULE_IMGPROC)
 //! [Include]
-#include <visp3/imgproc/vpImgproc.h>
+#include <visp3/imgproc_contrib/vpImgproc.h>
 //! [Include]
 #endif
 
-int main(int argc, const char ** argv) {
-  //! [Macro defined]
-#if defined(VISP_HAVE_MODULE_IMGPROC) && (defined(VISP_HAVE_X11) || defined(VISP_HAVE_GDI) || defined(VISP_HAVE_OPENCV))
+int main(int argc, const char **argv)
+{
+//! [Macro defined]
+#if defined(VISP_HAVE_MODULE_IMGPROC) && defined(VISP_HAVE_DISPLAY)
   //! [Macro defined]
   //!
+
+#ifdef ENABLE_VISP_NAMESPACE
+  using namespace  VISP_NAMESPACE_NAME;
+#endif
+
   std::string input_filename = "grid36-03.pgm";
 
   for (int i = 1; i < argc; i++) {
-    if (std::string(argv[i]) == "--input" && i+1 < argc) {
-      input_filename = std::string(argv[i+1]);
+    if (std::string(argv[i]) == "--input" && i + 1 < argc) {
+      input_filename = std::string(argv[i + 1]);
     }
     else if (std::string(argv[i]) == "--help" || std::string(argv[i]) == "-h") {
-      std::cout << "Usage: " << argv[0]
-                << " [--input <input image>] [--help]"
-                << std::endl;
+      std::cout << "Usage: " << argv[0] << " [--input <input image>] [--help]" << std::endl;
       return EXIT_SUCCESS;
     }
   }
@@ -36,72 +39,74 @@ int main(int argc, const char ** argv) {
   vpImage<unsigned char> I;
   vpImageIo::read(I, input_filename);
 
-  vpImage<unsigned char> I_res(3*I.getHeight(), 3*I.getWidth());
+  vpImage<unsigned char> I_res(3 * I.getHeight(), 3 * I.getWidth());
   I_res.insert(I, vpImagePoint(I.getHeight(), I.getWidth()));
 
-#ifdef VISP_HAVE_X11
-  vpDisplayX d;
-#elif defined(VISP_HAVE_GDI)
-  vpDisplayGDI d;
-#elif defined(VISP_HAVE_OPENCV)
-  vpDisplayOpenCV d;
+#if (VISP_CXX_STANDARD >= VISP_CXX_STANDARD_11)
+  std::shared_ptr<vpDisplay> display = vpDisplayFactory::createDisplay();
+#else
+  vpDisplay *display = vpDisplayFactory::allocateDisplay();
 #endif
-  d.setDownScalingFactor(vpDisplay::SCALE_2);
-  d.init(I_res);
+  display->setDownScalingFactor(vpDisplay::SCALE_2);
+  display->init(I_res);
 
   //! [Huang]
   vpImage<unsigned char> I_huang = I;
-  vp::autoThreshold(I_huang, vp::AUTO_THRESHOLD_HUANG);
-  //! [Huang]
+  contrib::autoThreshold(I_huang, contrib::AUTO_THRESHOLD_HUANG);
+ //! [Huang]
   I_res.insert(I_huang, vpImagePoint());
 
   //! [Intermodes]
   vpImage<unsigned char> I_intermodes = I;
-  vp::autoThreshold(I_intermodes, vp::AUTO_THRESHOLD_INTERMODES);
-  //! [Intermodes]
+  contrib::autoThreshold(I_intermodes, contrib::AUTO_THRESHOLD_INTERMODES);
+ //! [Intermodes]
   I_res.insert(I_intermodes, vpImagePoint(0, I.getWidth()));
 
   //! [IsoData]
   vpImage<unsigned char> I_isodata = I;
-  vp::autoThreshold(I_isodata, vp::AUTO_THRESHOLD_ISODATA);
-  //! [IsoData]
-  I_res.insert(I_isodata, vpImagePoint(0, 2*I.getWidth()));
+  contrib::autoThreshold(I_isodata, contrib::AUTO_THRESHOLD_ISODATA);
+ //! [IsoData]
+  I_res.insert(I_isodata, vpImagePoint(0, 2 * I.getWidth()));
 
   //! [Mean]
   vpImage<unsigned char> I_mean = I;
-  vp::autoThreshold(I_mean, vp::AUTO_THRESHOLD_MEAN);
-  //! [Mean]
+  contrib::autoThreshold(I_mean, contrib::AUTO_THRESHOLD_MEAN);
+ //! [Mean]
   I_res.insert(I_mean, vpImagePoint(I.getHeight(), 0));
 
   //! [Otsu]
   vpImage<unsigned char> I_otsu = I;
-  vp::autoThreshold(I_otsu, vp::AUTO_THRESHOLD_OTSU);
-  //! [Otsu]
-  I_res.insert(I_otsu, vpImagePoint(I.getHeight(), 2*I.getWidth()));
+  contrib::autoThreshold(I_otsu, contrib::AUTO_THRESHOLD_OTSU);
+ //! [Otsu]
+  I_res.insert(I_otsu, vpImagePoint(I.getHeight(), 2 * I.getWidth()));
 
   //! [Triangle]
   vpImage<unsigned char> I_triangle = I;
-  vp::autoThreshold(I_triangle, vp::AUTO_THRESHOLD_TRIANGLE);
-  //! [Triangle]
-  I_res.insert(I_triangle, vpImagePoint(2*I.getHeight(), 0));
+  contrib::autoThreshold(I_triangle, contrib::AUTO_THRESHOLD_TRIANGLE);
+ //! [Triangle]
+  I_res.insert(I_triangle, vpImagePoint(2 * I.getHeight(), 0));
 
   vpDisplay::display(I_res);
 
   vpDisplay::displayText(I_res, 30, 20, "Huang", vpColor::red);
-  vpDisplay::displayText(I_res, 30, 20+I.getWidth(), "Intermodes", vpColor::red);
-  vpDisplay::displayText(I_res, 30, 20+2*I.getWidth(), "IsoData", vpColor::red);
-  vpDisplay::displayText(I_res, 30+I.getHeight(), 20, "Mean", vpColor::red);
-  vpDisplay::displayText(I_res, 30+I.getHeight(), 20+I.getWidth(), "Original", vpColor::red);
-  vpDisplay::displayText(I_res, 30+I.getHeight(), 20+2*I.getWidth(), "Otsu", vpColor::red);
-  vpDisplay::displayText(I_res, 30+2*I.getHeight(), 20, "Triangle", vpColor::red);
+  vpDisplay::displayText(I_res, 30, 20 + static_cast<int>(I.getWidth()), "Intermodes", vpColor::red);
+  vpDisplay::displayText(I_res, 30, 20 + 2 * static_cast<int>(I.getWidth()), "IsoData", vpColor::red);
+  vpDisplay::displayText(I_res, 30 + static_cast<int>(I.getHeight()), 20, "Mean", vpColor::red);
+  vpDisplay::displayText(I_res, 30 + static_cast<int>(I.getHeight()), 20 + static_cast<int>(I.getWidth()), "Original", vpColor::red);
+  vpDisplay::displayText(I_res, 30 + static_cast<int>(I.getHeight()), 20 + 2 * static_cast<int>(I.getWidth()), "Otsu", vpColor::red);
+  vpDisplay::displayText(I_res, 30 + 2 * static_cast<int>(I.getHeight()), 20, "Triangle", vpColor::red);
 
   vpDisplay::flush(I_res);
   vpDisplay::getClick(I_res);
 
-  return EXIT_SUCCESS;
+#if (VISP_CXX_STANDARD < VISP_CXX_STANDARD_11) && defined(VISP_HAVE_DISPLAY)
+  if (display != nullptr) {
+    delete display;
+  }
+#endif
 #else
   (void)argc;
   (void)argv;
-  return 0;
 #endif
+  return EXIT_SUCCESS;
 }
