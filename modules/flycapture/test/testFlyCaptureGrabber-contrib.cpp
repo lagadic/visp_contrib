@@ -1,5 +1,4 @@
-/****************************************************************************
- *
+/*
  * This file is part of the ViSP software.
  * Copyright (C) 2005 - 2015 by Inria. All rights reserved.
  *
@@ -29,14 +28,10 @@
  *
  * Description:
  * Test for PointGrey FlyCapture SDK wrapper.
- *
- * Authors:
- * Fabien Spindler
- *
- *****************************************************************************/
+ */
 
 /*!
-  \example testFlyCaptureGrabber.cpp
+  \example testFlyCaptureGrabber-contrib.cpp
 
   Test PointGrey FlyCapture SDK wrapper to capture and display images.
 */
@@ -49,13 +44,17 @@
 #include <visp3/gui/vpDisplayOpenCV.h>
 #include <visp3/flycapture/vpFlyCaptureGrabber.h>
 
-int main(int argc, const char ** argv)
+#ifdef ENABLE_VISP_NAMESPACE
+using namespace VISP_NAMESPACE_NAME;
+#endif
+
+int main(int argc, const char **argv)
 {
 #if defined(VISP_HAVE_FLYCAPTURE)
   try {
     bool opt_display_on = true;
     bool opt_click_on = true;
-    for (int i=0; i<argc; i++) {
+    for (int i = 0; i<argc; i++) {
       if (std::string(argv[i]) == "-d")
         opt_display_on = false;
       if (std::string(argv[i]) == "-c")
@@ -70,12 +69,12 @@ int main(int argc, const char ** argv)
       }
     }
 
-    unsigned int numCameras = vpFlyCaptureGrabber::getNumCameras();
+    unsigned int numCameras = contrib::vpFlyCaptureGrabber::getNumCameras();
     std::cout << "Number of cameras detected: " << numCameras << std::endl;
     if (numCameras == 0)
       return 0;
 
-    vpFlyCaptureGrabber g;
+    contrib::vpFlyCaptureGrabber g;
     vpImage<unsigned char> I;
 
     g.setCameraIndex(0);
@@ -105,7 +104,7 @@ int main(int argc, const char ** argv)
     }
 
     bool ret = false;
-    while(!ret) {
+    while (!ret) {
       g.acquire(I);
       vpDisplay::display(I);
       vpDisplay::displayText(I, 10, 10, "Click to quit...", vpColor::red);
@@ -114,7 +113,7 @@ int main(int argc, const char ** argv)
         ret = vpDisplay::getClick(I, false);
       else {
         static unsigned int cpt = 0;
-        if (cpt ++ == 10)
+        if (cpt++ == 10)
           break;
       }
 
@@ -122,7 +121,7 @@ int main(int argc, const char ** argv)
     if (display != NULL)
       delete display;
   }
-  catch(vpException &e) {
+  catch (vpException &e) {
     std::cout << "Catch an exception: " << e.getStringMessage() << std::endl;
   }
 #else

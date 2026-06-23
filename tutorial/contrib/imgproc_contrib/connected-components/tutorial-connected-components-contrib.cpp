@@ -14,8 +14,13 @@
 //! [Include]
 #endif
 
-int main(int argc, const char ** argv) {
-  //! [Macro defined]
+#ifdef ENABLE_VISP_NAMESPACE
+using namespace  VISP_NAMESPACE_NAME;
+#endif
+
+int main(int argc, const char **argv)
+{
+//! [Macro defined]
 #if defined(VISP_HAVE_MODULE_IMGPROC) && (defined(VISP_HAVE_X11) || defined(VISP_HAVE_GDI) || defined(VISP_HAVE_OPENCV))
   //! [Macro defined]
 
@@ -25,13 +30,14 @@ int main(int argc, const char ** argv) {
   for (int i = 1; i < argc; i++) {
     if (std::string(argv[i]) == "--input" && i+1 < argc) {
       input_filename = std::string(argv[i+1]);
-    } else if (std::string(argv[i]) == "--connexity" && i+1 < argc) {
-      connexity = (vpImageMorphology::vpConnexityType) atoi(argv[i+1]);
+    }
+    else if (std::string(argv[i]) == "--connexity" && i+1 < argc) {
+      connexity = (vpImageMorphology::vpConnexityType)atoi(argv[i+1]);
     }
     else if (std::string(argv[i]) == "--help" || std::string(argv[i]) == "-h") {
       std::cout << "Usage: " << argv[0]
-                << " [--input <input image>] [--connexity <0: 4-connexity, 1: 8-connexity>] [--help]"
-                << std::endl;
+        << " [--input <input image>] [--connexity <0: 4-connexity, 1: 8-connexity>] [--help]"
+        << std::endl;
       return EXIT_SUCCESS;
     }
   }
@@ -62,9 +68,9 @@ int main(int argc, const char ** argv) {
   for (unsigned int i = 0; i < I_conn.getHeight(); i++) {
     for (unsigned int j = 0; j < I_conn.getWidth(); j++) {
       if (labels[i][j] != 0) {
-        I_conn[i][j] = vpRGBa(vpColor::getColor( (unsigned int) labels[i][j]).R,
-                              vpColor::getColor( (unsigned int) labels[i][j]).G,
-                              vpColor::getColor( (unsigned int) labels[i][j]).B);
+        I_conn[i][j] = vpRGBa(vpColor::getColor((unsigned int)labels[i][j]).R,
+                              vpColor::getColor((unsigned int)labels[i][j]).G,
+                              vpColor::getColor((unsigned int)labels[i][j]).B);
       }
     }
   }

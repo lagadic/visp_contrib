@@ -1,11 +1,11 @@
-/****************************************************************************
+/*
+ * ViSP, open source Visual Servoing Platform software.
+ * Copyright (C) 2005 - 2026 by Inria. All rights reserved.
  *
- * This file is part of the ViSP software.
- * Copyright (C) 2005 - 2015 by Inria. All rights reserved.
- *
- * This software is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * ("GPL") version 2 as published by the Free Software Foundation.
+ * This software is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  * See the file LICENSE.txt at the root directory of this source
  * distribution for additional information about the GNU GPL.
  *
@@ -13,7 +13,7 @@
  * GPL, please contact Inria about acquiring a ViSP Professional
  * Edition License.
  *
- * See http://visp.inria.fr for more information.
+ * See https://visp.inria.fr for more information.
  *
  * This software was developed at:
  * Inria Rennes - Bretagne Atlantique
@@ -29,54 +29,52 @@
  *
  * Description:
  * Test imgproc functions.
- *
- * Authors:
- * Souriya Trinh
- *
- *****************************************************************************/
+ */
 
+/*!
+  \example testImgproc-contrib.cpp
+
+  \brief Test imgproc functions.
+*/
+
+#include <cstdio>
+#include <cstdlib>
 #include <visp3/core/vpImage.h>
-#include <visp3/io/vpImageIo.h>
-#include <visp3/io/vpParseArgv.h>
 #include <visp3/core/vpIoTools.h>
 #include <visp3/core/vpMath.h>
 #include <visp3/imgproc_contrib/vpImgproc.h>
-#include <stdlib.h>
-#include <stdio.h>
+#include <visp3/io/vpImageIo.h>
+#include <visp3/io/vpParseArgv.h>
 
+// List of allowed command line options
+#define GETOPTARGS "cdi:o:h"
 
- /*!
-   \example testImgproc.cpp
+#ifdef ENABLE_VISP_NAMESPACE
+using namespace  VISP_NAMESPACE_NAME;
+#endif
 
-   \brief Test imgproc functions.
-
- */
-
- // List of allowed command line options
-#define GETOPTARGS  "cdi:o:h"
-
-void usage(const char* name, const char* badparam, std::string ipath, std::string opath, std::string user);
-bool getOptions(int argc, const char** argv, std::string& ipath, std::string& opath, std::string user);
+void usage(const char *name, const char *badparam, const std::string &ipath, const std::string &opath, const std::string &user);
+bool getOptions(int argc, const char **argv, std::string &ipath, std::string &opath, std::string user);
 
 /*
-
   Print the program options.
 
   \param name : Program name.
   \param badparam : Bad parameter name.
-  \param ipath: Input image path.
+  \param ipath : Input image path.
   \param opath : Output image path.
   \param user : Username.
-
  */
-void usage(const char* name, const char* badparam, std::string ipath, std::string opath, std::string user) {
+void usage(const char *name, const char *badparam, const std::string &ipath, const std::string &opath, const std::string &user)
+{
   fprintf(stdout, "\n\
 Test imgproc functions.\n\
 \n\
 SYNOPSIS\n\
   %s [-i <input image path>] [-o <output image path>]\n\
      [-h]\n                 \
-", name);
+",
+name);
 
   fprintf(stdout, "\n\
 OPTIONS:                                               Default\n\
@@ -100,62 +98,58 @@ OPTIONS:                                               Default\n\
 
   if (badparam)
     fprintf(stdout, "\nERROR: Bad parameter [%s]\n", badparam);
-  }
+}
 
 /*!
-
   Set the program options.
 
   \param argc : Command line number of parameters.
   \param argv : Array of command line parameters.
-  \param ipath: Input image path.
+  \param ipath : Input image path.
   \param opath : Output image path.
   \param user : Username.
   \return false if the program has to be stopped, true otherwise.
-
 */
-bool getOptions(int argc, const char** argv, std::string& ipath, std::string& opath, std::string user) {
-  const char* optarg_;
+bool getOptions(int argc, const char **argv, std::string &ipath, std::string &opath, std::string user)
+{
+  const char *optarg_;
   int c;
   while ((c = vpParseArgv::parse(argc, argv, GETOPTARGS, &optarg_)) > 1) {
 
     switch (c) {
-      case 'i': ipath = optarg_; break;
-      case 'o': opath = optarg_; break;
-      case 'h': usage(argv[0], NULL, ipath, opath, user); return false; break;
+    case 'i':
+      ipath = optarg_;
+      break;
+    case 'o':
+      opath = optarg_;
+      break;
+    case 'h':
+      usage(argv[0], nullptr, ipath, opath, user);
+      return false;
 
-      case 'c':
-      case 'd':
-        break;
+    case 'c':
+    case 'd':
+      break;
 
-      default:
-        usage(argv[0], optarg_, ipath, opath, user); return false; break;
-      }
+    default:
+      usage(argv[0], optarg_, ipath, opath, user);
+      return false;
     }
+  }
 
   if ((c == 1) || (c == -1)) {
     // standalone param or error
-    usage(argv[0], NULL, ipath, opath, user);
+    usage(argv[0], nullptr, ipath, opath, user);
     std::cerr << "ERROR: " << std::endl;
     std::cerr << "  Bad argument " << optarg_ << std::endl << std::endl;
     return false;
-    }
+  }
 
   return true;
-  }
+}
 
-/*!
-  Using a look-up table, adjust the pixel intensities.
-
-  \param I : Input color image.
-  \param lut : Look-up table mapping for each intensity the new corresponding value.
-*/
-void lut_method(vpImage<vpRGBa>& I, const vpRGBa(&lut)[256]) {
-  I.performLut(lut);
-  }
-
-int
-main(int argc, const char** argv) {
+int main(int argc, const char **argv)
+{
   try {
     std::string env_ipath;
     std::string opt_ipath;
@@ -165,14 +159,26 @@ main(int argc, const char** argv) {
     std::string filename;
     std::string username;
 
-    // Get the visp-images-data package path or VISP_INPUT_IMAGE_PATH environment variable value
+#if defined(VISP_HAVE_DATASET)
+#if VISP_HAVE_DATASET_VERSION >= 0x030600
+    std::string ext("png");
+#else
+    std::string ext("pgm");
+#endif
+#else
+    // We suppose that the user will download a recent dataset
+    std::string ext("png");
+#endif
+
+    // Get the visp-images-data package path or VISP_INPUT_IMAGE_PATH
+    // environment variable value
     env_ipath = vpIoTools::getViSPImagesDataPath();
 
     // Set the default input path
     if (!env_ipath.empty())
       ipath = env_ipath;
 
-    // Set the default output path
+// Set the default output path
 #if defined(_WIN32)
     opt_opath = "C:/temp";
 #else
@@ -184,8 +190,8 @@ main(int argc, const char** argv) {
 
     // Read the command line options
     if (getOptions(argc, argv, opt_ipath, opt_opath, username) == false) {
-      exit(-1);
-      }
+      return EXIT_FAILURE;
+    }
 
     // Get the option values
     if (!opt_ipath.empty())
@@ -201,232 +207,207 @@ main(int argc, const char** argv) {
       try {
         // Create the dirname
         vpIoTools::makeDirectory(opath);
-        }
+      }
       catch (...) {
-        usage(argv[0], NULL, ipath, opt_opath, username);
-        std::cerr << std::endl
-          << "ERROR:" << std::endl;
+        usage(argv[0], nullptr, ipath, opt_opath, username);
+        std::cerr << std::endl << "ERROR:" << std::endl;
         std::cerr << "  Cannot create " << opath << std::endl;
         std::cerr << "  Check your -o " << opt_opath << " option " << std::endl;
-        exit(-1);
-        }
+        return EXIT_FAILURE;
       }
+    }
 
     // Compare ipath and env_ipath. If they differ, we take into account
-    // the input path comming from the command line option
+    // the input path coming from the command line option
     if (!opt_ipath.empty() && !env_ipath.empty()) {
       if (ipath != env_ipath) {
-        std::cout << std::endl
-          << "WARNING: " << std::endl;
+        std::cout << std::endl << "WARNING: " << std::endl;
         std::cout << "  Since -i <visp image path=" << ipath << "> "
           << "  is different from VISP_IMAGE_PATH=" << env_ipath << std::endl
           << "  we skip the environment variable." << std::endl;
-        }
       }
+    }
 
     // Test if an input path is set
     if (opt_ipath.empty() && env_ipath.empty()) {
-      usage(argv[0], NULL, ipath, opt_opath, username);
-      std::cerr << std::endl
-        << "ERROR:" << std::endl;
-      std::cerr << "  Use -i <visp image path> option or set VISP_INPUT_IMAGE_PATH "
-        << std::endl
+      usage(argv[0], nullptr, ipath, opt_opath, username);
+      std::cerr << std::endl << "ERROR:" << std::endl;
+      std::cerr << "  Use -i <visp image path> option or set VISP_INPUT_IMAGE_PATH " << std::endl
         << "  environment variable to specify the location of the " << std::endl
-        << "  image path where test images are located." << std::endl << std::endl;
-      exit(-1);
-      }
-
+        << "  image path where test images are located." << std::endl
+        << std::endl;
+      return EXIT_FAILURE;
+    }
 
     //
     // Here starts really the test
     //
 
     //
-    //Test color functions using Klimt.ppm
+    // Test color functions using Klimt.ppm
     //
 
-    //Read Klimt.ppm
+    // Read Klimt.ppm
     filename = vpIoTools::createFilePath(ipath, "Klimt/Klimt.ppm");
-    vpImage<vpRGBa> I_color;
+    vpImage<vpRGBa> I_color, Iinput_color;
     std::cout << "Read image: " << filename << std::endl;
-    vpImageIo::read(I_color, filename);
+    vpImageIo::read(Iinput_color, filename);
+    Iinput_color.halfSizeImage(I_color);
     std::cout << "Image: " << I_color.getWidth() << "x" << I_color.getHeight() << std::endl;
 
-
-    //Adjust
+    // Adjust
     double alpha = 1.5, beta = -10.0;
     vpImage<vpRGBa> I_color_adjust;
     double t = vpTime::measureTimeMs();
-    vp::adjust(I_color, I_color_adjust, alpha, beta);
+    contrib::adjust(I_color, I_color_adjust, alpha, beta);
     t = vpTime::measureTimeMs() - t;
     std::cout << "Time to do color adjust: " << t << " ms" << std::endl;
 
-    //Save adjust
+    // Save adjust
     filename = vpIoTools::createFilePath(opath, "Klimt_adjust.ppm");
     vpImageIo::write(I_color_adjust, filename);
 
-
-    //Equalize Histogram
+    // Equalize Histogram
     vpImage<vpRGBa> I_color_equalize_histogram;
     t = vpTime::measureTimeMs();
-    vp::equalizeHistogram(I_color, I_color_equalize_histogram);
+    contrib::equalizeHistogram(I_color, I_color_equalize_histogram);
     t = vpTime::measureTimeMs() - t;
     std::cout << "Time to do color histogram equalization: " << t << " ms" << std::endl;
 
-    //Save equalizeHistogram
+    // Save equalizeHistogram
     filename = vpIoTools::createFilePath(opath, "Klimt_equalize_histogram.ppm");
     vpImageIo::write(I_color_equalize_histogram, filename);
 
-
-    //Gamma correction
+    // Gamma correction
     vpImage<vpRGBa> I_color_gamma_correction;
-    double gamma = 2.2;
+    float gamma = 2.2f;
     t = vpTime::measureTimeMs();
-    vp::gammaCorrection(I_color, I_color_gamma_correction, gamma);
+    contrib::gammaCorrection(I_color, I_color_gamma_correction, gamma);
     t = vpTime::measureTimeMs() - t;
     std::cout << "Time to do color gamma correction: " << t << " ms" << std::endl;
 
-    //Save gammaCorrection
+    // Save gammaCorrection
     filename = vpIoTools::createFilePath(opath, "Klimt_gamma_correction.ppm");
     vpImageIo::write(I_color_gamma_correction, filename);
 
-
-    //Retinex
+    // Retinex
     vpImage<vpRGBa> I_color_retinex;
     t = vpTime::measureTimeMs();
-    vp::retinex(I_color, I_color_retinex);
+    contrib::retinex(I_color, I_color_retinex);
     t = vpTime::measureTimeMs() - t;
     std::cout << "Time to do color retinex: " << t << " ms" << std::endl;
 
-    //Save retinex
+    // Save retinex
     filename = vpIoTools::createFilePath(opath, "Klimt_retinex.ppm");
     vpImageIo::write(I_color_retinex, filename);
 
-
-    //Stretch contrast
+    // Stretch contrast
     vpImage<vpRGBa> I_color_stretch_contrast;
     t = vpTime::measureTimeMs();
-    vp::stretchContrast(I_color, I_color_stretch_contrast);
+    contrib::stretchContrast(I_color, I_color_stretch_contrast);
     t = vpTime::measureTimeMs() - t;
     std::cout << "Time to do color contrast stretching: " << t << " ms" << std::endl;
 
-    //Save stretchContrast
+    // Save stretchContrast
     filename = vpIoTools::createFilePath(opath, "Klimt_stretch_contrast.ppm");
     vpImageIo::write(I_color_stretch_contrast, filename);
 
-
-    //Stretch Contrast HSV
+    // Stretch Contrast HSV
     vpImage<vpRGBa> I_color_stretch_contrast_HSV;
     t = vpTime::measureTimeMs();
-    vp::stretchContrastHSV(I_color, I_color_stretch_contrast_HSV);
+    contrib::stretchContrastHSV(I_color, I_color_stretch_contrast_HSV);
     t = vpTime::measureTimeMs() - t;
     std::cout << "Time to do color HSV contrast stretching: " << t << " ms" << std::endl;
 
-    //Save stretchContrastHSV
+    // Save stretchContrastHSV
     filename = vpIoTools::createFilePath(opath, "Klimt_stretch_contrast_HSV.ppm");
     vpImageIo::write(I_color_stretch_contrast_HSV, filename);
 
-
-    //Unsharp Mask
+    // Unsharp Mask
     vpImage<vpRGBa> I_color_unsharp_mask;
+    const float sigma = 1.0f;
     t = vpTime::measureTimeMs();
-    vp::unsharpMask(I_color, I_color_unsharp_mask);
+    contrib::unsharpMask(I_color, I_color_unsharp_mask, sigma);
     t = vpTime::measureTimeMs() - t;
     std::cout << "Time to do color unsharp mask: " << t << " ms" << std::endl;
 
-    //Save unsharpMask
+    // Save unsharpMask
     filename = vpIoTools::createFilePath(opath, "Klimt_unsharp_mask.ppm");
     vpImageIo::write(I_color_unsharp_mask, filename);
 
-
-
     //
-    //Test grayscale function using image0000.pgm
+    // Test grayscale function using image0000.png
     //
-#if defined(VISP_HAVE_DATASET)
-#if VISP_HAVE_DATASET_VERSION >= 0x030600
-    std::string ext("png");
-#else
-    std::string ext("pgm");
-#endif
-#else
-  // We suppose that the user will download a recent dataset
-    std::string ext("png");
-#endif
-    //Read image0000.pgm
+
+    // Read image0000.png
     filename = vpIoTools::createFilePath(ipath, "mbt/cube/image0000." + ext);
-    vpImage<unsigned char> I;
+    vpImage<unsigned char> Iinput, I;
     std::cout << "\nRead image: " << filename << std::endl;
-    vpImageIo::read(I, filename);
+    vpImageIo::read(Iinput, filename);
+    Iinput.halfSizeImage(I);
     std::cout << "Image: " << I.getWidth() << "x" << I.getHeight() << std::endl;
 
-
-    //Adjust
+    // Adjust
     vpImage<unsigned char> I_adjust;
     beta = -20.0;
     t = vpTime::measureTimeMs();
-    vp::adjust(I, I_adjust, alpha, beta);
+    contrib::adjust(I, I_adjust, alpha, beta);
     t = vpTime::measureTimeMs() - t;
     std::cout << "Time to do grayscale adjust: " << t << " ms" << std::endl;
 
-    //Save adjust
-    filename = vpIoTools::createFilePath(opath, "image0000_adjust.pgm");
+    // Save adjust
+    filename = vpIoTools::createFilePath(opath, "image0000_adjust.png");
     vpImageIo::write(I_adjust, filename);
 
-
-    //Equalize Histogram
+    // Equalize Histogram
     vpImage<unsigned char> I_equalize_histogram;
     t = vpTime::measureTimeMs();
-    vp::equalizeHistogram(I, I_equalize_histogram);
+    contrib::equalizeHistogram(I, I_equalize_histogram);
     t = vpTime::measureTimeMs() - t;
     std::cout << "Time to do grayscale histogram equalization: " << t << " ms" << std::endl;
 
-    //Save equalizeHistogram
-    filename = vpIoTools::createFilePath(opath, "image0000_equalize_histogram.pgm");
+    // Save equalizeHistogram
+    filename = vpIoTools::createFilePath(opath, "image0000_equalize_histogram.png");
     vpImageIo::write(I_equalize_histogram, filename);
 
-
-    //Gamma correction
+    // Gamma correction
     vpImage<unsigned char> I_gamma_correction;
-    gamma = 1.8;
+    gamma = 1.8f;
     t = vpTime::measureTimeMs();
-    vp::gammaCorrection(I, I_gamma_correction, gamma);
+    contrib::gammaCorrection(I, I_gamma_correction, gamma);
     t = vpTime::measureTimeMs() - t;
     std::cout << "Time to do grayscale gamma correction: " << t << " ms" << std::endl;
 
-    //Save gammaCorrection
-    filename = vpIoTools::createFilePath(opath, "image0000_gamma_correction.pgm");
+    // Save gammaCorrection
+    filename = vpIoTools::createFilePath(opath, "image0000_gamma_correction.png");
     vpImageIo::write(I_gamma_correction, filename);
 
-
-    //Stretch contrast
+    // Stretch contrast
     vpImage<unsigned char> I_stretch_contrast;
     t = vpTime::measureTimeMs();
-    vp::stretchContrast(I, I_stretch_contrast);
+    contrib::stretchContrast(I, I_stretch_contrast);
     t = vpTime::measureTimeMs() - t;
     std::cout << "Time to do grayscale contrast stretching: " << t << " ms" << std::endl;
 
-    //Save stretchContrast
-    filename = vpIoTools::createFilePath(opath, "image0000_stretch_contrast.pgm");
+    // Save stretchContrast
+    filename = vpIoTools::createFilePath(opath, "image0000_stretch_contrast.png");
     vpImageIo::write(I_stretch_contrast, filename);
 
-
-    //Unsharp Mask
+    // Unsharp Mask
     vpImage<unsigned char> I_unsharp_mask;
     t = vpTime::measureTimeMs();
-    vp::unsharpMask(I, I_unsharp_mask);
+    contrib::unsharpMask(I, I_unsharp_mask, sigma);
     t = vpTime::measureTimeMs() - t;
     std::cout << "Time to do grayscale unsharp mask: " << t << " ms" << std::endl;
 
-    //Save unsharpMask
-    filename = vpIoTools::createFilePath(opath, "image0000_unsharp_mask.pgm");
+    // Save unsharpMask
+    filename = vpIoTools::createFilePath(opath, "image0000_unsharp_mask.png");
     vpImageIo::write(I_unsharp_mask, filename);
 
-
-    return 0;
-    }
-  catch (vpException& e) {
-    std::cerr << "Catch an exception: " << e.what() << std::endl;
-    return 1;
-    }
+    return EXIT_SUCCESS;
   }
+  catch (const vpException &e) {
+    std::cerr << "Catch an exception: " << e.what() << std::endl;
+    return EXIT_FAILURE;
+  }
+}
